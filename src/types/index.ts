@@ -2,7 +2,7 @@ export interface Article {
   id: string;
   title: string;
   subtitle?: string;
-  category: 'AGRO' | 'ECONOMIA' | 'NEGÓCIOS' | 'REGIÃO' | 'ENTREVISTAS' | 'LOGÍSTICA' | 'INOVAÇÃO';
+  category: 'AGRO' | 'ECONOMIA' | 'NEGÓCIOS' | 'REGIÃO' | 'ENTREVISTAS' | 'LOGÍSTICA' | 'INOVAÇÃO' | 'EVENTOS' | string;
   categoryColor?: string;
   imageUrl: string;
   imageAlt?: string;

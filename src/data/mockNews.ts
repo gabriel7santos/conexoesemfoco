@@ -13,28 +13,28 @@ export const mockWeather: WeatherInfo[] = [
   { city: 'Rio Verde', temp: '27°C', condition: 'Parcialmente Nublado' },
 ];
 
-export const mainFeaturedArticle: Article = {
-  id: 'agro-desenvolvimento-goias',
-  title: 'O agro impulsiona o desenvolvimento de Goiás',
-  subtitle:
-    'Setor segue em expansão e fortalece a economia da região com exportações recordes, alta produtividade nas lavouras e vanguarda em inovação sustentável no campo.',
-  category: 'AGRO',
-  highlightTag: 'DESTAQUE PRINCIPAL',
-  imageUrl:
-    'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1600&q=80',
-  imageAlt: 'Colheitadeira moderna trabalhando em lavoura de grãos em Goiás durante o pôr do sol',
-  publishedAt: 'Publicado hoje às 08:30',
-  readTime: '4 min de leitura',
-  author: 'Redação Conexões • Campo',
-  isMainLead: true,
-  content: [
-    'O agronegócio goiano consolidou sua liderança no cenário nacional ao alcançar novos recordes de produtividade e volume de exportação na safra 2024/2025.',
-    'Municípios como Rio Verde, Jataí, Cristalina e Montividiu continuam atraindo investimentos robustos em biotecnologia, maquinários autônomos e conectividade rural de ponta.',
-    'A união entre sustentabilidade e alta tecnologia permitiu que os produtores locais mantivessem um crescimento contínuo, mesmo diante das oscilações climáticas globais, consolidando Goiás como um polo indispensável para a segurança alimentar do planeta.',
-  ],
-};
-
-export const secondaryLeadArticles: Article[] = [
+export const allArticles: Article[] = [
+  {
+    id: 'agro-desenvolvimento-goias',
+    title: 'O agro impulsiona o desenvolvimento de Goiás',
+    subtitle:
+      'Setor segue em expansão e fortalece a economia da região com exportações recordes, alta produtividade nas lavouras e vanguarda em inovação sustentável no campo.',
+    category: 'AGRO',
+    highlightTag: 'DESTAQUE PRINCIPAL',
+    imageUrl:
+      'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1600&q=80',
+    imageAlt: 'Colheitadeira moderna trabalhando em lavoura de grãos em Goiás durante o pôr do sol',
+    publishedAt: 'Publicado hoje às 08:30',
+    readTime: '4 min de leitura',
+    author: 'Redação Conexões • Campo',
+    isMainLead: true,
+    content: [
+      'O agronegócio goiano consolidou sua liderança no cenário nacional ao alcançar novos recordes de produtividade e volume de exportação na safra 2024/2025. Com solos férteis e a aplicação intensiva de biotecnologia, o estado vem se distanciando como o motor econômico do Centro-Oeste.',
+      'Municípios estratégicos como Rio Verde, Jataí, Cristalina e Montividiu continuam atraindo investimentos robustos em maquinários autônomos, conectividade 5G em áreas rurais e sistemas inteligentes de irrigação por pivô central.',
+      'Segundo lideranças do setor produtivo, a grande virada de chave está na sustentabilidade aliada à rentabilidade: "Hoje, o produtor de Goiás não apenas colhe mais por hectare, mas regenera o solo com plantas de cobertura e bioinsumos produzidos na própria fazenda", destaca o relatório anual de inteligência agrícola.',
+      'A expansão da malha logística da Ferrovia Norte-Sul e a duplicação de trechos vitais da BR-060 completam o ecossistema que assegura o escoamento veloz da safra até os portos marítimos de Santos e Itaqui, garantindo preços competitivos no mercado global.',
+    ],
+  },
   {
     id: 'rio-verde-negocios-qualidade-vida',
     title: 'Rio Verde se consolida como referência em negócios e qualidade de vida',
@@ -50,7 +50,8 @@ export const secondaryLeadArticles: Article[] = [
     isSecondaryLead: true,
     content: [
       'Rio Verde experimenta uma nova fase de expansão urbana e diversificação econômica, impulsionada pelo fortalecimento das agroindústrias e do setor de serviços.',
-      'Novos empreendimentos comerciais e melhorias viárias estão atraindo profissionais qualificados e novas empresas para a região sudoeste.',
+      'A chegada de novos centros de tecnologia, condomínios empresariais e hospitais de alta complexidade transformou o município em um polo de atração para jovens executivos, pesquisadores e famílias que buscam desenvolvimento com qualidade de vida.',
+      'O PIB per capita do município figura entre os maiores da região Centro-Oeste, respaldado por uma cadeia que vai do plantio de grãos ao processamento industrial de carnes e óleos vegetais.',
     ],
   },
   {
@@ -68,19 +69,16 @@ export const secondaryLeadArticles: Article[] = [
     isSecondaryLead: true,
     content: [
       'A articulação entre os setores público e privado em Goiás tem gerado frutos promissores para a aceleração de pequenas e médias empresas.',
-      'Eventos regionais e fóruns de negócios estão criando conexões estratégicas entre investidores e projetos inovadores do estado.',
+      'Centros de inovação instalados em polos como Anápolis, Goiânia e Rio Verde estão conectando pesquisadores acadêmicos a problemas reais enfrentados pelos produtores no campo.',
+      'O investimento em fundos de venture capital focados em agritechs e cleantechs já supera R$ 180 milhões no estado nos últimos doze meses.',
     ],
   },
-];
-
-export const curatedNewsArticles: Article[] = [
   {
     id: 'safra-recorde-graos-2025',
     title: 'Safra recorde de grãos projeta superávit histórico na balança goiana em 2025',
     subtitle:
       'O avanço técnico das colheitadeiras autônomas e a expansão da área irrigada em Cristalina e Jataí impulsionam projeções da safra de soja e milho safrinha.',
     category: 'AGRO',
-    categoryColor: 'bg-emerald-700 text-white',
     imageUrl:
       'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80',
     publishedAt: 'Há 40 minutos',
@@ -93,8 +91,9 @@ export const curatedNewsArticles: Article[] = [
       trendType: 'positive',
     },
     content: [
-      'A expansão das áreas de agricultura de precisão está permitindo recordes contínuos de produtividade por hectare em solo goiano.',
-      'Os dados preliminares apontam para um desempenho superior a safras passadas, reforçando o superávit comercial do estado.',
+      'A estimativa oficial para a colheita goiana de grãos aponta para um salto de 14,2% em relação ao ciclo anterior, atingindo a marca expressiva de 32,8 milhões de toneladas.',
+      'O destaque absoluto foi o ganho de eficiência: a área plantada cresceu de forma moderada, enquanto o rendimento médio por talhão bateu recordes históricos graças à agricultura de precisão.',
+      'O saldo positivo das exportações já se reflete na arrecadação municipal das regiões produtoras, possibilitando investimentos diretos em escolas e estradas vicinais.',
     ],
   },
   {
@@ -113,8 +112,9 @@ export const curatedNewsArticles: Article[] = [
       route: 'Rio Verde → Anápolis → Santos',
     },
     content: [
-      'A modernização da malha viária e ferroviária representa um divisor de águas para a competitividade das exportações do Centro-Oeste.',
-      'A diminuição do tempo de trânsito até os portos marítimos de Santos e Paranaguá reduz sensivelmente os custos logísticos.',
+      'A integração logística entre os polos produtores de Goiás e os terminais marítimos de exportação deu um salto com a entrega de novos viadutos e pistas duplas.',
+      'A redução no custo de transporte chega a 18% para cargas conteinerizadas de farelo e carnes frigorificadas, tornando a indústria goiana ainda mais competitiva.',
+      'Projetos multimodais que ligam rodovias à ferrovia Norte-Sul no polo de Anápolis e Santa Helena de Goiás são os motores dessa transformação.',
     ],
   },
   {
@@ -136,7 +136,63 @@ export const curatedNewsArticles: Article[] = [
     },
     content: [
       'No episódio de hoje do Conexões Cast, recebemos pesquisadores e empreendedores para analisar o impacto direto da inteligência artificial aplicada ao manejo de lavouras e bioinsumos.',
-      'Descubra como fazendas de Goiás já estão utilizando sensores inteligentes para economizar água e defensivos.',
+      'Drones equipados com câmeras multiespectrais já detectam focos de pragas antes mesmo que os sintomas sejam visíveis a olho nu, permitindo aplicações cirúrgicas de defensivos.',
+      'A automação e a digitalização estão reduzindo custos operacionais em até 30% em propriedades modelo em Goiás.',
+    ],
+  },
+  {
+    id: 'circuito-eventos-agro-goias-2026',
+    title: 'Circuito de feiras e feiras de negócios movimenta R$ 4 bilhões em Goiás',
+    subtitle:
+      'Calendário de eventos agropecuários e rodadas de negócios impulsiona turismo de negócios e vendas de maquinários no estado.',
+    category: 'EVENTOS',
+    imageUrl:
+      'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+    publishedAt: 'Ontem às 17:40',
+    readTime: '3 min de leitura',
+    author: 'Redação Eventos & Mercado',
+    content: [
+      'As grandes feiras de negócios de Goiás, como a Tecnoshow Comigo em Rio Verde e a Agro Centro-Oeste em Goiânia, projetam números históricos para suas próximas edições.',
+      'A presença de comitivas internacionais de países da Ásia e da Europa reforça o prestígio global das inovações agrícolas desenvolvidas em terras goianas.',
+      'A rede hoteleira e de serviços dos municípios anfitriões opera com 100% de ocupação durante as semanas de evento.',
+    ],
+  },
+  {
+    id: 'credito-verde-sustentabilidade-rural',
+    title: 'Linhas de crédito verde crescem 45% entre produtores do sudoeste goiano',
+    subtitle:
+      'Instituições financeiras oferecem juros reduzidos para propriedades com certificações socioambientais e manejo de carbono.',
+    category: 'ECONOMIA',
+    imageUrl:
+      'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80',
+    publishedAt: 'Ontem às 14:20',
+    readTime: '4 min de leitura',
+    author: 'Conexões Finanças',
+    content: [
+      'O mercado de finanças sustentáveis ganhou escala definitiva no agronegócio goiano com a expansão das CPRs Verdes e títulos de transição climática.',
+      'Produtores que comprovam preservação de áreas de reserva legal e adoção de plantio direto conseguem taxas de juros até 2 pontos percentuais menores junto aos bancos cooperativos.',
     ],
   },
 ];
+
+export const mainFeaturedArticle = allArticles[0];
+export const secondaryLeadArticles = [allArticles[1], allArticles[2]];
+export const curatedNewsArticles = [allArticles[3], allArticles[4], allArticles[5]];
+
+export function getArticleById(id: string): Article | undefined {
+  return allArticles.find((a) => a.id === id);
+}
+
+export function getArticlesByCategory(category: string): Article[] {
+  const catUpper = category.toUpperCase();
+  if (catUpper === 'NOTICIAS' || catUpper === 'NOTÍCIAS' || catUpper === 'TODOS') {
+    return allArticles;
+  }
+  return allArticles.filter((a) => a.category.toUpperCase() === catUpper);
+}
+
+export function getRelatedArticles(currentId: string, category: string, limit = 3): Article[] {
+  return allArticles
+    .filter((a) => a.id !== currentId && (a.category === category || a.isSecondaryLead))
+    .slice(0, limit);
+}

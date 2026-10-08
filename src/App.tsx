@@ -1,23 +1,16 @@
 import React, { useState, useMemo } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { TopBar } from './components/TopBar';
 import { Header } from './components/Header';
-import { HeroSection } from './components/HeroSection';
-import { TopicsRail } from './components/TopicsRail';
-import { NewsGrid } from './components/NewsGrid';
-import { NewsletterSection } from './components/NewsletterSection';
 import { Footer } from './components/Footer';
-import { ArticleModal } from './components/ArticleModal';
-import {
-  mainFeaturedArticle,
-  secondaryLeadArticles,
-  curatedNewsArticles,
-} from './data/mockNews';
-import { Article } from './types';
+import { ScrollToTop } from './components/ScrollToTop';
+import { HomePage } from './pages/HomePage';
+import { ArticlePage } from './pages/ArticlePage';
+import { CategoryPage } from './pages/CategoryPage';
+import { allArticles } from './data/mockNews';
 
-export const App: React.FC = () => {
-  const [selectedTopic, setSelectedTopic] = useState('todos');
-  const [activeCategory, setActiveCategory] = useState('inicio');
-  const [activeArticle, setActiveArticle] = useState<Article | null>(null);
+const MainLayout: React.FC = () => {
+  const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
@@ -25,12 +18,7 @@ export const App: React.FC = () => {
   const [subscribeEmail, setSubscribeEmail] = useState('');
   const [subscribeDone, setSubscribeDone] = useState(false);
 
-  // Todos os artigos juntos para busca
-  const allArticles = useMemo(() => {
-    return [mainFeaturedArticle, ...secondaryLeadArticles, ...curatedNewsArticles];
-  }, []);
-
-  // Filtragem por busca
+  // Filtragem de busca em todas as matérias
   const filteredArticles = useMemo(() => {
     if (!searchQuery.trim()) return allArticles;
     const q = searchQuery.toLowerCase();
@@ -40,38 +28,7 @@ export const App: React.FC = () => {
         a.subtitle?.toLowerCase().includes(q) ||
         a.category.toLowerCase().includes(q)
     );
-  }, [allArticles, searchQuery]);
-
-  // Filtragem por tópico das pílulas
-  const displayedCuratedNews = useMemo(() => {
-    if (selectedTopic === 'todos') return curatedNewsArticles;
-    if (selectedTopic === 'agro') {
-      return curatedNewsArticles.filter((a) => a.category === 'AGRO');
-    }
-    if (selectedTopic === 'economia' || selectedTopic === 'cotacoes') {
-      return curatedNewsArticles.filter(
-        (a) => a.category === 'ECONOMIA' || a.category === 'AGRO'
-      );
-    }
-    if (selectedTopic === 'entrevistas') {
-      return curatedNewsArticles.filter((a) => a.category === 'ENTREVISTAS');
-    }
-    return curatedNewsArticles;
-  }, [selectedTopic]);
-
-  const handleCategorySelect = (cat: string) => {
-    setActiveCategory(cat);
-    if (cat === 'inicio') {
-      setSelectedTopic('todos');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (cat === 'agro') {
-      setSelectedTopic('agro');
-    } else if (cat === 'economia') {
-      setSelectedTopic('economia');
-    } else if (cat === 'entrevistas') {
-      setSelectedTopic('entrevistas');
-    }
-  };
+  }, [searchQuery]);
 
   const handleSubscribeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,49 +44,30 @@ export const App: React.FC = () => {
 
   return (
     <div className="bg-[#f8f9ff] font-sans text-[#0b1c30] min-h-screen flex flex-col antialiased">
+      <ScrollToTop />
+
       {/* HEADER FIXO SUPERIOR */}
       <header className="fixed top-0 left-0 right-0 z-40 w-full shadow-[0_8px_24px_-4px_rgba(14,27,43,0.12)]">
         <TopBar />
         <Header
           onSearchClick={() => setIsSearchOpen(true)}
           onSubscribeClick={() => setIsSubscribeModalOpen(true)}
-          activeCategory={activeCategory}
-          onCategorySelect={handleCategorySelect}
         />
       </header>
 
-      {/* CONTEÚDO PRINCIPAL (COM PADDING TOP PARA COMPENSAR O HEADER FIXO DE 116PX) */}
-      <main className="w-full flex-1 pt-[124px] bg-[#F8FAFC]">
-        <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 w-full">
-          {/* SEÇÃO HERO (MANCHETE PRINCIPAL + 2 CARDS SECUNDÁRIOS) */}
-          <HeroSection
-            mainArticle={mainFeaturedArticle}
-            secondaryArticles={secondaryLeadArticles}
-            onArticleClick={(article) => setActiveArticle(article)}
-          />
-
-          {/* BARRA HORIZONTAL DE TEMAS EM DESTAQUE (PÍLULAS) */}
-          <TopicsRail
-            selectedTopic={selectedTopic}
-            onSelectTopic={(topic) => setSelectedTopic(topic)}
-          />
-
-          {/* GRADE EDITORIAL DE ÚLTIMAS NOTÍCIAS */}
-          <NewsGrid
-            articles={displayedCuratedNews}
-            onArticleClick={(article) => setActiveArticle(article)}
-          />
-
-          {/* SEÇÃO BOLETIM & NEWSLETTER */}
-          <NewsletterSection />
-        </div>
+      {/* ÁREA DE CONTEÚDO PRINCIPAL COM PADDING TOP PARA COMPENSAR O HEADER FIXO */}
+      <main className="w-full flex-1 pt-[116px] bg-[#F8FAFC]">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/materia/:id" element={<ArticlePage />} />
+          <Route path="/categoria/:slug" element={<CategoryPage />} />
+          {/* Rota de fallback */}
+          <Route path="*" element={<HomePage />} />
+        </Routes>
       </main>
 
       {/* RODAPÉ INSTITUCIONAL */}
       <Footer />
-
-      {/* MODAL DE LEITURA COMPLETA DA MATÉRIA */}
-      <ArticleModal article={activeArticle} onClose={() => setActiveArticle(null)} />
 
       {/* MODAL DE BUSCA RÁPIDA */}
       {isSearchOpen && (
@@ -170,7 +108,7 @@ export const App: React.FC = () => {
                     key={art.id}
                     onClick={() => {
                       setIsSearchOpen(false);
-                      setActiveArticle(art);
+                      navigate(`/materia/${art.id}`);
                     }}
                     className="p-3 rounded-xl hover:bg-gray-50 cursor-pointer flex items-center justify-between gap-4 transition-colors"
                   >
@@ -266,4 +204,13 @@ export const App: React.FC = () => {
     </div>
   );
 };
+
+export const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <MainLayout />
+    </BrowserRouter>
+  );
+};
+
 export default App;

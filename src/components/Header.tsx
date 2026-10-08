@@ -1,42 +1,36 @@
 import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onSearchClick: () => void;
   onSubscribeClick: () => void;
-  activeCategory: string;
-  onCategorySelect: (category: string) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  onSearchClick,
-  onSubscribeClick,
-  activeCategory,
-  onCategorySelect,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ onSearchClick, onSubscribeClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const menuItems = [
-    { id: 'inicio', label: 'INÍCIO' },
-    { id: 'noticias', label: 'NOTÍCIAS' },
-    { id: 'agro', label: 'AGRO' },
-    { id: 'economia', label: 'ECONOMIA' },
-    { id: 'regiao', label: 'REGIÃO' },
-    { id: 'entrevistas', label: 'ENTREVISTAS' },
-    { id: 'eventos', label: 'EVENTOS' },
+    { path: '/', label: 'INÍCIO' },
+    { path: '/categoria/noticias', label: 'NOTÍCIAS' },
+    { path: '/categoria/agro', label: 'AGRO' },
+    { path: '/categoria/economia', label: 'ECONOMIA' },
+    { path: '/categoria/regiao', label: 'REGIÃO' },
+    { path: '/categoria/entrevistas', label: 'ENTREVISTAS' },
+    { path: '/categoria/eventos', label: 'EVENTOS' },
   ];
+
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname === path;
+  };
 
   return (
     <div className="w-full bg-[#0E1B2B] text-white border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 lg:px-8 h-20 flex items-center justify-between gap-6">
         {/* Logo */}
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onCategorySelect('inicio');
-          }}
-          className="flex items-center gap-3 shrink-0 group"
-        >
+        <Link to="/" className="flex items-center gap-3 shrink-0 group">
           <div className="relative flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 border border-white/20 group-hover:border-[#23B26D] transition-colors">
             <span className="material-symbols-outlined text-[#7afbae] text-[24px]">my_location</span>
           </div>
@@ -48,24 +42,24 @@ export const Header: React.FC<HeaderProps> = ({
               EM FOCO • GOIÁS
             </span>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-6 xl:gap-8 h-full">
           {menuItems.map((item) => {
-            const isActive = activeCategory === item.id;
+            const active = isActive(item.path);
             return (
-              <button
-                key={item.id}
-                onClick={() => onCategorySelect(item.id)}
+              <Link
+                key={item.path}
+                to={item.path}
                 className={`text-[13px] font-bold uppercase tracking-wider transition-colors py-2 border-b-2 ${
-                  isActive
+                  active
                     ? 'text-[#7afbae] border-[#7afbae]'
                     : 'text-gray-300 hover:text-white border-transparent'
                 }`}
               >
                 {item.label}
-              </button>
+              </Link>
             );
           })}
         </nav>
@@ -113,16 +107,18 @@ export const Header: React.FC<HeaderProps> = ({
       {mobileMenuOpen && (
         <div className="lg:hidden bg-[#0A1420] border-t border-white/10 px-4 py-4 space-y-2">
           {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                onCategorySelect(item.id);
-                setMobileMenuOpen(false);
-              }}
-              className="block w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold tracking-wider uppercase text-gray-200 hover:bg-white/10 hover:text-[#7afbae]"
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`block w-full text-left py-2.5 px-3 rounded-lg text-sm font-semibold tracking-wider uppercase transition-colors ${
+                isActive(item.path)
+                  ? 'bg-white/10 text-[#7afbae]'
+                  : 'text-gray-200 hover:bg-white/10 hover:text-[#7afbae]'
+              }`}
             >
               {item.label}
-            </button>
+            </Link>
           ))}
           <div className="pt-3 border-t border-white/10">
             <button

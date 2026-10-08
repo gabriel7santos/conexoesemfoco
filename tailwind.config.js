@@ -1,0 +1,45 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#000000",
+        "primary-container": "#0f1c2c",
+        "on-primary": "#ffffff",
+        "on-primary-container": "#788599",
+        "primary-fixed": "#d6e3fa",
+        "primary-fixed-dim": "#bac7dd",
+        "secondary": "#006d3f",
+        "on-secondary": "#ffffff",
+        "secondary-container": "#77f8ac",
+        "secondary-fixed": "#7afbae",
+        "secondary-fixed-dim": "#5bde94",
+        "tertiary": "#000000",
+        "tertiary-container": "#001d32",
+        "tertiary-fixed": "#cde5ff",
+        "tertiary-fixed-dim": "#97ccfc",
+        "surface": "#f8f9ff",
+        "on-surface": "#0b1c30",
+        "on-surface-variant": "#44474c",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-low": "#eff4ff",
+        "surface-container": "#e5eeff",
+        "surface-container-high": "#dce9ff",
+        "surface-container-highest": "#d3e4fe",
+        "brand-navy": "#0E1B2B",
+        "brand-green": "#23B26D",
+        "brand-blue": "#4178A7",
+      },
+      fontFamily: {
+        sans: ["'Plus Jakarta Sans'", "sans-serif"],
+        inter: ["'Inter'", "sans-serif"],
+      },
+    },
+  },
+  plugins: [],
+}

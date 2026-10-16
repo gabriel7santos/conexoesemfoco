@@ -3,50 +3,65 @@ import { useNavigate } from 'react-router-dom';
 import { HeroSection } from '../components/HeroSection';
 import { TopicsRail } from '../components/TopicsRail';
 import { NewsGrid } from '../components/NewsGrid';
-import { NewsletterSection } from '../components/NewsletterSection';
+import { SpecialHubsSection } from '../components/SpecialHubsSection';
+import { AdBanner } from '../components/AdBanner';
 import {
   mainFeaturedArticle,
   secondaryLeadArticles,
-  curatedNewsArticles,
+  allArticles,
 } from '../data/mockNews';
 import { Article } from '../types';
 
-export const HomePage: React.FC = () => {
+interface HomePageProps {
+  onOpenAdModal?: () => void;
+}
+
+export const HomePage: React.FC<HomePageProps> = ({ onOpenAdModal }) => {
   const navigate = useNavigate();
   const [selectedTopic, setSelectedTopic] = useState('todos');
 
-  const displayedCuratedNews = useMemo(() => {
-    if (selectedTopic === 'todos') return curatedNewsArticles;
+  // Filtragem inteligente por tópicos
+  const displayedArticles = useMemo(() => {
+    if (selectedTopic === 'todos') {
+      return allArticles.filter((a) => !a.isMainLead && !a.isSecondaryLead).slice(0, 6);
+    }
     if (selectedTopic === 'agro') {
-      return curatedNewsArticles.filter((a) => a.category === 'AGRO');
+      return allArticles.filter((a) => a.category.toLowerCase().includes('agro'));
     }
-    if (selectedTopic === 'economia' || selectedTopic === 'cotacoes') {
-      return curatedNewsArticles.filter(
-        (a) => a.category === 'ECONOMIA' || a.category === 'AGRO'
-      );
+    if (selectedTopic === 'cidade') {
+      return allArticles.filter((a) => a.category.toLowerCase().includes('cidade'));
     }
-    if (selectedTopic === 'entrevistas') {
-      return curatedNewsArticles.filter((a) => a.category === 'ENTREVISTAS');
+    if (selectedTopic === 'politica') {
+      return allArticles.filter((a) => a.category.toLowerCase().includes('pol'));
     }
-    return curatedNewsArticles;
+    if (selectedTopic === 'saude') {
+      return allArticles.filter((a) => a.category.toLowerCase().includes('saúde'));
+    }
+    if (selectedTopic === 'economia') {
+      return allArticles.filter((a) => a.category.toLowerCase().includes('economia'));
+    }
+    if (selectedTopic === 'geopolitica') {
+      return allArticles.filter((a) => a.category.toLowerCase().includes('geo'));
+    }
+    if (selectedTopic === 'empresarial') {
+      return allArticles.filter((a) => a.hubType === 'empresarial');
+    }
+    if (selectedTopic === 'lei') {
+      return allArticles.filter((a) => a.hubType === 'lei');
+    }
+    return allArticles.slice(3, 9);
   }, [selectedTopic]);
 
   const handleArticleClick = (article: Article) => {
     navigate(`/materia/${article.id}`);
   };
 
-  const handleTopicSelect = (topic: string) => {
-    if (topic === 'agro' || topic === 'economia' || topic === 'entrevistas') {
-      // Também pode navegar para a página inteira da editoria se quiser
-      setSelectedTopic(topic);
-    } else {
-      setSelectedTopic(topic);
-    }
-  };
-
   return (
     <div className="w-full">
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 w-full">
+        {/* ESPAÇO PUBLICITÁRIO: SUPERBANNER TOPO */}
+        <AdBanner type="leaderboard" onOpenAdModal={onOpenAdModal} className="mb-6" />
+
         {/* SEÇÃO HERO (MANCHETE PRINCIPAL + 2 CARDS SECUNDÁRIOS) */}
         <HeroSection
           mainArticle={mainFeaturedArticle}
@@ -54,20 +69,23 @@ export const HomePage: React.FC = () => {
           onArticleClick={handleArticleClick}
         />
 
-        {/* BARRA HORIZONTAL DE TEMAS EM DESTAQUE (PÍLULAS) */}
+        {/* BARRA HORIZONTAL DE TEMAS EM DESTAQUE (PÍLULAS DAS 6 CATEGORIAS) */}
         <TopicsRail
           selectedTopic={selectedTopic}
-          onSelectTopic={handleTopicSelect}
+          onSelectTopic={(topic) => setSelectedTopic(topic)}
         />
 
-        {/* GRADE EDITORIAL DE ÚLTIMAS NOTÍCIAS */}
+        {/* GRADE EDITORIAL DE NOTÍCIAS, ARTIGOS E PUBLIS */}
         <NewsGrid
-          articles={displayedCuratedNews}
+          articles={displayedArticles}
           onArticleClick={handleArticleClick}
         />
 
-        {/* SEÇÃO BOLETIM & NEWSLETTER */}
-        <NewsletterSection />
+        {/* ESPAÇO PUBLICITÁRIO IN-FEED */}
+        <AdBanner type="leaderboard" onOpenAdModal={onOpenAdModal} className="mb-10" />
+
+        {/* SEÇÃO ESPECIAL DOS 3 AMBIENTES (CONEXÃO EMPRESARIAL, COM A LEI, AGENDA DE EVENTOS) */}
+        <SpecialHubsSection />
       </div>
     </div>
   );

@@ -1,25 +1,87 @@
-import { Article, MarketQuote, WeatherInfo } from '../types';
+import { Article, MarketQuote, WeatherInfo, EventItem } from '../types';
 
+// COTAÇÕES INSPIRADAS NO CANAL RURAL / GIRO DO BOI
 export const mockQuotes: MarketQuote[] = [
-  { id: '1', name: 'Soja Rio Verde', value: 'R$ 128,50', variation: '▲ +0.8%', isPositive: true },
-  { id: '2', name: 'Milho Jataí', value: 'R$ 54,20', variation: '▼ -0.3%', isPositive: false },
-  { id: '3', name: 'Boi Gordo GO', value: 'R$ 245,00' },
-  { id: '4', name: 'Dólar', value: 'R$ 5,42', variation: '▲ +0.15%', isPositive: true },
-  { id: '5', name: 'Etanol Hidratado GO', value: 'R$ 2,75' },
+  {
+    id: 'boi-gordo',
+    name: 'Boi Gordo (Giro do Boi)',
+    label: 'CEPEA/B3',
+    value: 'R$ 248,50 / @',
+    variation: '▲ +1.2%',
+    isPositive: true,
+    marketPlace: 'Goiás / SP',
+    isHighlight: true,
+  },
+  {
+    id: 'dolar',
+    name: 'Dólar Comercial',
+    label: 'Câmbio',
+    value: 'R$ 5,46',
+    variation: '▲ +0.32%',
+    isPositive: true,
+    isHighlight: true,
+  },
+  {
+    id: 'soja',
+    name: 'Soja',
+    label: 'Saca 60kg',
+    value: 'R$ 129,00',
+    variation: '▲ +0.78%',
+    isPositive: true,
+    marketPlace: 'Rio Verde - GO',
+  },
+  {
+    id: 'milho',
+    name: 'Milho',
+    label: 'Saca 60kg',
+    value: 'R$ 54,80',
+    variation: '▼ -0.36%',
+    isPositive: false,
+    marketPlace: 'Jataí - GO',
+  },
+  {
+    id: 'etanol',
+    name: 'Etanol Hidratado',
+    label: 'Usina',
+    value: 'R$ 2,78 / L',
+    variation: '▲ +0.10%',
+    isPositive: true,
+    marketPlace: 'Goiás',
+  },
+  {
+    id: 'bezerro',
+    name: 'Bezerro Nelore',
+    label: 'Reposição',
+    value: 'R$ 2.150,00',
+    variation: '▲ +0.95%',
+    isPositive: true,
+    marketPlace: 'Goiás',
+  },
+  {
+    id: 'cafe',
+    name: 'Café Arábica',
+    label: 'Tipo 6 Duro',
+    value: 'R$ 1.480,00',
+    variation: '▼ -0.20%',
+    isPositive: false,
+  },
 ];
 
-export const mockWeather: WeatherInfo[] = [
-  { city: 'Goiânia', temp: '29°C', condition: 'Ensolarado' },
-  { city: 'Rio Verde', temp: '27°C', condition: 'Parcialmente Nublado' },
+export const fallbackWeather: WeatherInfo[] = [
+  { city: 'Rio Verde', temp: '28°C', condition: 'Sol com Nuvens', max: '31°C', min: '20°C', humidity: '54%' },
+  { city: 'Goiânia', temp: '29°C', condition: 'Ensolarado', max: '32°C', min: '21°C', humidity: '48%' },
+  { city: 'Jataí', temp: '27°C', condition: 'Céu Limpo', max: '30°C', min: '19°C', humidity: '58%' },
 ];
 
 export const allArticles: Article[] = [
+  // 1. MATÉRIA - AGRO (MANCHETE DE CAPA)
   {
     id: 'agro-desenvolvimento-goias',
-    title: 'O agro impulsiona o desenvolvimento de Goiás',
+    title: 'O agro impulsiona o desenvolvimento de Goiás com safra histórica',
     subtitle:
       'Setor segue em expansão e fortalece a economia da região com exportações recordes, alta produtividade nas lavouras e vanguarda em inovação sustentável no campo.',
-    category: 'AGRO',
+    category: 'Agro',
+    contentType: 'materia',
     highlightTag: 'DESTAQUE PRINCIPAL',
     imageUrl:
       'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1600&q=80',
@@ -35,18 +97,21 @@ export const allArticles: Article[] = [
       'A expansão da malha logística da Ferrovia Norte-Sul e a duplicação de trechos vitais da BR-060 completam o ecossistema que assegura o escoamento veloz da safra até os portos marítimos de Santos e Itaqui, garantindo preços competitivos no mercado global.',
     ],
   },
+
+  // 2. MATÉRIA - CIDADE
   {
     id: 'rio-verde-negocios-qualidade-vida',
     title: 'Rio Verde se consolida como referência em negócios e qualidade de vida',
     subtitle:
       'Com forte atração de agroindústrias e infraestrutura de ponta, o polo do sudoeste goiano acelera o crescimento sustentável.',
-    category: 'ECONOMIA',
+    category: 'Cidade',
+    contentType: 'materia',
     imageUrl:
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
     imageAlt: 'Vista urbana e prédios modernos de centro de negócios',
     publishedAt: 'Há 25 minutos',
     readTime: '3 min de leitura',
-    author: 'Redação Goiânia',
+    author: 'Redação Regional',
     isSecondaryLead: true,
     content: [
       'Rio Verde experimenta uma nova fase de expansão urbana e diversificação econômica, impulsionada pelo fortalecimento das agroindústrias e do setor de serviços.',
@@ -54,124 +119,175 @@ export const allArticles: Article[] = [
       'O PIB per capita do município figura entre os maiores da região Centro-Oeste, respaldado por uma cadeia que vai do plantio de grãos ao processamento industrial de carnes e óleos vegetais.',
     ],
   },
+
+  // 3. ARTIGO DE OPINIÃO - ECONOMIA (CONEXÃO EMPRESARIAL)
   {
-    id: 'parcerias-oportunidades-ecossistema-goias',
-    title: 'Parcerias que geram oportunidades para o ecossistema regional de Goiás',
+    id: 'gestao-estrategica-agro-empresas',
+    title: 'Gestão Estratégica: O novo perfil das empresas familiares em Goiás',
     subtitle:
-      'Acordos entre cooperativas, startups e universidades aceleram a transferência de tecnologia para o produtor rural.',
-    category: 'NEGÓCIOS',
+      'Profissionalização de diretorias e governança corporativa aceleram a sucessão nas fazendas e indústrias goianas.',
+    category: 'Economia',
+    contentType: 'artigo',
+    hubType: 'empresarial',
     imageUrl:
       'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80',
-    imageAlt: 'Executivos selando parceria comercial em sala corporativa',
     publishedAt: 'Há 1 hora',
-    readTime: '3 min de leitura',
-    author: 'Conexões Business',
+    readTime: '5 min de leitura',
+    author: 'Dr. Marcos Valadares',
+    columnist: {
+      name: 'Dr. Marcos Valadares',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      role: 'Consultor de Governança & Finanças Corporativas',
+      bio: 'Especialista em governança para grupos agroindustriais, conselheiro de empresas familiares e autor de artigos sobre sucessão no Centro-Oeste.',
+    },
     isSecondaryLead: true,
     content: [
-      'A articulação entre os setores público e privado em Goiás tem gerado frutos promissores para a aceleração de pequenas e médias empresas.',
-      'Centros de inovação instalados em polos como Anápolis, Goiânia e Rio Verde estão conectando pesquisadores acadêmicos a problemas reais enfrentados pelos produtores no campo.',
-      'O investimento em fundos de venture capital focados em agritechs e cleantechs já supera R$ 180 milhões no estado nos últimos doze meses.',
+      'A transição geracional nos grupos agropecuários e nas empresas de Goiás deixou de ser um tabu para se tornar o vetor determinante de sobrevivência e expansão no mercado moderno.',
+      'Empresas que adotam conselhos consultivos independentes e protocolos familiares claros conseguem reduzir atritos em até 70%, garantindo que a terceira geração preserve o legado produtivo com visão de mercado aberto.',
+      'Em Goiás, vemos cases notáveis de produtores rurais que transformaram simples propriedades rurais em corporações estruturadas com auditoria externa e captação de recursos via Fiagros.',
     ],
   },
+
+  // 4. ARTIGO DE OPINIÃO - POLÍTICA / CONEXÃO COM A LEI
   {
-    id: 'safra-recorde-graos-2025',
-    title: 'Safra recorde de grãos projeta superávit histórico na balança goiana em 2025',
+    id: 'seguranca-juridica-contratos-agrarios',
+    title: 'Segurança Jurídica: Como blindar contratos agrários na safra 2025/2026',
     subtitle:
-      'O avanço técnico das colheitadeiras autônomas e a expansão da área irrigada em Cristalina e Jataí impulsionam projeções da safra de soja e milho safrinha.',
-    category: 'AGRO',
+      'Análise sobre cláusulas de força maior, antecipação de grãos e mitigação de litígios no agronegócio.',
+    category: 'Política',
+    contentType: 'artigo',
+    hubType: 'lei',
     imageUrl:
-      'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80',
-    publishedAt: 'Há 40 minutos',
+      'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
+    publishedAt: 'Hoje às 07:15',
+    readTime: '6 min de leitura',
+    author: 'Dra. Camila Nogueira',
+    columnist: {
+      name: 'Dra. Camila Nogueira',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
+      role: 'Advogada Especialista em Direito Agrário & Tributário',
+      bio: 'Sócia fundadora da Nogueira & Associados, assessora jurídica de cooperativas agrícolas e membro da Comissão de Direito Agrário de Goiás.',
+    },
+    content: [
+      'Os recentes episódios de volatilidade climática e quebra de safras acenderam o alerta vermelho para a redação dos contratos de compra e venda futura de grãos no Brasil.',
+      'Cláusulas genéricas de "caso fortuito ou força maior" não oferecem a proteção que o produtor e a trading imaginam. É imperativo que os contratos especifiquem limites pluviométricos e parâmetros técnicos para renegociação sem litígio.',
+      'Neste artigo, examino como a jurisprudência recente dos tribunais goianos tem valorizado o cumprimento dos contratos de barter e a importância da assessoria preventiva para ambas as partes.',
+    ],
+  },
+
+  // 5. PUBLIEDITORIAL (CONTEÚDO PATROCINADO) - SAÚDE E BEM ESTAR
+  {
+    id: 'medicina-preventiva-longevidade-goiania',
+    title: 'Medicina Preventiva: Como a tecnologia está revolucionando o bem-estar e a longevidade',
+    subtitle:
+      'Check-ups genéticos e acompanhamento multidisciplinar tornam-se prioridade para profissionais e empresários de alta performance.',
+    category: 'Saúde e Bem Estar',
+    contentType: 'publi',
+    sponsor: {
+      name: 'Centro Médico Integrado Vitalis',
+      brandColor: '#059669',
+      disclaimer: 'Conteúdo Patrocinado • Informe Publicitário',
+    },
+    imageUrl:
+      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80',
+    publishedAt: 'Ontem às 16:30',
     readTime: '4 min de leitura',
-    author: 'Equipe de Economia Rural',
+    author: 'Equipe de Comunicação Vitalis',
+    content: [
+      'A rotina acelerada dos negócios exige uma abordagem de saúde que vá muito além do tratamento de sintomas pontuais. A medicina preventiva e personalizada surge como a maior aliada de quem busca equilíbrio físico e mental.',
+      'Com equipamentos de diagnóstico molecular de última geração instalados em Goiás, o Centro Médico Vitalis oferece programas personalizados de monitoramento da saúde cardiovascular, estresse oxidativo e otimização do sono.',
+      '"Investir em prevenção com exames precoces não apenas eleva a qualidade de vida, mas evita interrupções abruptas na carreira e no dia a dia executivo", destaca a diretoria médica da instituição.',
+    ],
+  },
+
+  // 6. MATÉRIA - GEO POLÍTICA
+  {
+    id: 'geopolitica-rotas-asiaticas-exportacao',
+    title: 'Rota Asiática: As novas exigências globais para a carne e os grãos de Goiás',
+    subtitle:
+      'Acordos bilaterais entre Brasil e China impulsionam rastreabilidade digital e abrem novas cotas de exportação para frigoríficos goianos.',
+    category: 'Geo Política',
+    contentType: 'materia',
+    imageUrl:
+      'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80',
+    publishedAt: 'Ontem às 11:20',
+    readTime: '4 min de leitura',
+    author: 'Correspondente Internacional',
     metrics: {
-      label: 'Evolução Safra GO',
-      value: '32.8M Toneladas',
-      trend: '+14.2% GO',
+      label: 'Participação da Ásia',
+      value: '68% do Agro GO',
+      trend: '+8.4% no trimestre',
       trendType: 'positive',
     },
     content: [
-      'A estimativa oficial para a colheita goiana de grãos aponta para um salto de 14,2% em relação ao ciclo anterior, atingindo a marca expressiva de 32,8 milhões de toneladas.',
-      'O destaque absoluto foi o ganho de eficiência: a área plantada cresceu de forma moderada, enquanto o rendimento médio por talhão bateu recordes históricos graças à agricultura de precisão.',
-      'O saldo positivo das exportações já se reflete na arrecadação municipal das regiões produtoras, possibilitando investimentos diretos em escolas e estradas vicinais.',
+      'As recentes negociações diplomáticas entre Brasília e Pequim resultaram na habilitação de novas plantas frigoríficas goianas para abate e exportação imediata para o mercado consumidor asiático.',
+      'Contudo, o acesso a esse mercado exige o cumprimento estrito de normas de rastreabilidade animal individual e certificação de não desmatamento via satélite.',
+      'O Porto Seco de Anápolis e o Corredor Ferroviário Centro-Atlântica despontam como estruturas estratégicas para manter o fluxo contínuo dos contêineres refrigerados.',
     ],
   },
+
+  // 7. MATÉRIA - CIDADE / CONEXÃO EMPRESARIAL
   {
-    id: 'infraestrutura-rodoviaria-sudoeste-portos',
-    title: 'Investimentos em infraestrutura rodoviária ligam o sudoeste goiano aos portos',
+    id: 'polo-farmaceutico-anapolis-expansao',
+    title: 'Polo Farmacêutico e Industrial de Anápolis atrai R$ 600 milhões em novos investimentos',
     subtitle:
-      'Obras estruturantes no anel viário e a integração com terminais multimodais aceleram a saída de farelo e óleo com redução de custo de frete por tonelada.',
-    category: 'LOGÍSTICA',
+      'Incentivos e localização central consolidam o DAIA como o segundo maior polo de medicamentos do país.',
+    category: 'Cidade',
+    contentType: 'materia',
+    hubType: 'empresarial',
     imageUrl:
-      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-    publishedAt: 'Há 2 horas',
-    readTime: '5 min de leitura',
-    author: 'Repórter Especial Logística',
-    locationRoute: {
-      title: 'Corredor de Exportação',
-      route: 'Rio Verde → Anápolis → Santos',
-    },
-    content: [
-      'A integração logística entre os polos produtores de Goiás e os terminais marítimos de exportação deu um salto com a entrega de novos viadutos e pistas duplas.',
-      'A redução no custo de transporte chega a 18% para cargas conteinerizadas de farelo e carnes frigorificadas, tornando a indústria goiana ainda mais competitiva.',
-      'Projetos multimodais que ligam rodovias à ferrovia Norte-Sul no polo de Anápolis e Santa Helena de Goiás são os motores dessa transformação.',
-    ],
-  },
-  {
-    id: 'tendencias-agritech-2025-ia-podcast',
-    title: 'Tendências do agritech para 2025: IA na lavoura e bioinsumos no Centro-Oeste',
-    subtitle:
-      'Especialistas do polo tecnológico debatem como a conectividade no campo está gerando uma nova geração de cooperativas digitais.',
-    category: 'ENTREVISTAS',
-    imageUrl:
-      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80',
-    publishedAt: 'Hoje, 07:15',
-    readTime: 'Áudio • 28 min',
-    author: 'Conexões Cast',
-    audio: {
-      available: true,
-      duration: '28 min • Alta fidelidade',
-      episodeNumber: 'PODCAST #42',
-      title: 'IA e o Futuro do Agronegócio Goiano',
-    },
-    content: [
-      'No episódio de hoje do Conexões Cast, recebemos pesquisadores e empreendedores para analisar o impacto direto da inteligência artificial aplicada ao manejo de lavouras e bioinsumos.',
-      'Drones equipados com câmeras multiespectrais já detectam focos de pragas antes mesmo que os sintomas sejam visíveis a olho nu, permitindo aplicações cirúrgicas de defensivos.',
-      'A automação e a digitalização estão reduzindo custos operacionais em até 30% em propriedades modelo em Goiás.',
-    ],
-  },
-  {
-    id: 'circuito-eventos-agro-goias-2026',
-    title: 'Circuito de feiras e feiras de negócios movimenta R$ 4 bilhões em Goiás',
-    subtitle:
-      'Calendário de eventos agropecuários e rodadas de negócios impulsiona turismo de negócios e vendas de maquinários no estado.',
-    category: 'EVENTOS',
-    imageUrl:
-      'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
-    publishedAt: 'Ontem às 17:40',
+      'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80',
+    publishedAt: 'Há 3 horas',
     readTime: '3 min de leitura',
-    author: 'Redação Eventos & Mercado',
+    author: 'Redação Negócios',
     content: [
-      'As grandes feiras de negócios de Goiás, como a Tecnoshow Comigo em Rio Verde e a Agro Centro-Oeste em Goiânia, projetam números históricos para suas próximas edições.',
-      'A presença de comitivas internacionais de países da Ásia e da Europa reforça o prestígio global das inovações agrícolas desenvolvidas em terras goianas.',
-      'A rede hoteleira e de serviços dos municípios anfitriões opera com 100% de ocupação durante as semanas de evento.',
+      'O Distrito Agroindustrial de Anápolis (DAIA) vive um momento histórico de expansão com a confirmação de três novas fábricas de princípios ativos e insumos farmacêuticos.',
+      'A previsão das autoridades é que mais de 2.200 postos diretos de trabalho sejam gerados nos próximos dois anos.',
     ],
   },
+];
+
+export const mockEvents: EventItem[] = [
   {
-    id: 'credito-verde-sustentabilidade-rural',
-    title: 'Linhas de crédito verde crescem 45% entre produtores do sudoeste goiano',
-    subtitle:
-      'Instituições financeiras oferecem juros reduzidos para propriedades com certificações socioambientais e manejo de carbono.',
-    category: 'ECONOMIA',
+    id: 'evento-1',
+    title: 'Tecnoshow Comigo 2026',
+    category: 'Agro',
+    date: '07 a 11 de Abril',
+    time: '08:00 às 18:00',
+    location: 'Centro Tecnológico Comigo',
+    city: 'Rio Verde - GO',
     imageUrl:
-      'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80',
-    publishedAt: 'Ontem às 14:20',
-    readTime: '4 min de leitura',
-    author: 'Conexões Finanças',
-    content: [
-      'O mercado de finanças sustentáveis ganhou escala definitiva no agronegócio goiano com a expansão das CPRs Verdes e títulos de transição climática.',
-      'Produtores que comprovam preservação de áreas de reserva legal e adoção de plantio direto conseguem taxas de juros até 2 pontos percentuais menores junto aos bancos cooperativos.',
-    ],
+      'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80',
+    description:
+      'A maior feira de tecnologia rural do Centro-Oeste brasileiro, reunindo mais de 650 expositores e lançamentos de maquinários, sementes e biológicos.',
+  },
+  {
+    id: 'evento-2',
+    title: 'Fórum Goiano de Direito Agrário & Negócios',
+    category: 'Institucional',
+    date: '24 e 25 de Maio',
+    time: '09:00 às 17:30',
+    location: 'Auditório OAB Goiás / Flamboyant',
+    city: 'Goiânia - GO',
+    imageUrl:
+      'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&q=80',
+    description:
+      'Debates sobre securitização do agro, CPRs verdes, governança familiar e marco legal das terras com os maiores juristas do país.',
+  },
+  {
+    id: 'evento-3',
+    title: 'ExpoNegócios & Franchising Goiás',
+    category: 'Negócios',
+    date: '12 de Junho',
+    time: '14:00 às 21:00',
+    location: 'Centro de Convenções de Anápolis',
+    city: 'Anápolis - GO',
+    imageUrl:
+      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80',
+    description:
+      'Rodadas de negócios B2B e captação de investimentos para redes de franquias, prestadores de serviços e startups do Centro-Oeste.',
   },
 ];
 
@@ -184,15 +300,28 @@ export function getArticleById(id: string): Article | undefined {
 }
 
 export function getArticlesByCategory(category: string): Article[] {
-  const catUpper = category.toUpperCase();
-  if (catUpper === 'NOTICIAS' || catUpper === 'NOTÍCIAS' || catUpper === 'TODOS') {
+  const norm = category.toLowerCase().trim();
+  if (norm === 'noticias' || norm === 'notícias' || norm === 'todas') {
     return allArticles;
   }
-  return allArticles.filter((a) => a.category.toUpperCase() === catUpper);
+  return allArticles.filter((a) => {
+    const artCat = a.category.toLowerCase().trim();
+    if (norm === 'agro' && artCat === 'agro') return true;
+    if (norm === 'cidade' && artCat === 'cidade') return true;
+    if (norm === 'politica' || norm === 'política') return artCat.includes('pol');
+    if (norm.includes('saude') || norm.includes('saúde')) return artCat.includes('saúde');
+    if (norm === 'economia' && artCat === 'economia') return true;
+    if (norm.includes('geo')) return artCat.includes('geo');
+    return artCat === norm;
+  });
+}
+
+export function getArticlesByHub(hubType: 'empresarial' | 'lei' | 'eventos'): Article[] {
+  return allArticles.filter((a) => a.hubType === hubType);
 }
 
 export function getRelatedArticles(currentId: string, category: string, limit = 3): Article[] {
   return allArticles
-    .filter((a) => a.id !== currentId && (a.category === category || a.isSecondaryLead))
+    .filter((a) => a.id !== currentId)
     .slice(0, limit);
 }

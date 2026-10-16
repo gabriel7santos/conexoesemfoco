@@ -6,8 +6,13 @@ import {
   allArticles,
   mockQuotes,
 } from '../data/mockNews';
+import { AdBanner } from '../components/AdBanner';
 
-export const ArticlePage: React.FC = () => {
+interface ArticlePageProps {
+  onOpenAdModal?: () => void;
+}
+
+export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
@@ -21,10 +26,10 @@ export const ArticlePage: React.FC = () => {
           article
         </span>
         <h1 className="text-2xl font-extrabold text-[#0b1c30] mb-2">
-          Matéria não encontrada
+          Publicação não encontrada
         </h1>
         <p className="text-gray-500 mb-6 text-sm">
-          A notícia que você procura pode ter sido movida ou não existe mais.
+          O conteúdo que você procura pode ter sido movido ou não existe mais.
         </p>
         <Link
           to="/"
@@ -36,13 +41,16 @@ export const ArticlePage: React.FC = () => {
     );
   }
 
+  const isArtigo = article.contentType === 'artigo';
+  const isPubli = article.contentType === 'publi';
+
   const relatedArticles = getRelatedArticles(article.id, article.category, 3);
   const mostRead = allArticles.filter((a) => a.id !== article.id).slice(0, 4);
 
   const handleShareWhatsApp = () => {
     const url = window.location.href;
     const text = encodeURIComponent(
-      `Confira esta notícia no Conexões em FOCO: ${article.title} - ${url}`
+      `Confira no portal Conexões em FOCO: ${article.title} - ${url}`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
@@ -76,9 +84,20 @@ export const ArticlePage: React.FC = () => {
         {/* ARTIGO HEADER */}
         <header className="max-w-4xl mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <span className="px-3 py-1 rounded bg-[#006d3f] text-white text-[11px] uppercase tracking-wider font-extrabold">
-              {article.category}
-            </span>
+            {isPubli ? (
+              <span className="px-3 py-1 rounded bg-amber-600 text-white text-[11px] uppercase tracking-wider font-extrabold shadow">
+                INFORME PUBLICITÁRIO
+              </span>
+            ) : isArtigo ? (
+              <span className="px-3 py-1 rounded bg-indigo-900 text-white text-[11px] uppercase tracking-wider font-extrabold shadow">
+                ARTIGO DE OPINIÃO
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded bg-[#006d3f] text-white text-[11px] uppercase tracking-wider font-extrabold">
+                {article.category}
+              </span>
+            )}
+
             {article.highlightTag && (
               <span className="px-2.5 py-1 rounded bg-emerald-100 text-[#006d3f] text-[11px] uppercase tracking-wider font-bold">
                 {article.highlightTag}
@@ -96,14 +115,38 @@ export const ArticlePage: React.FC = () => {
             </p>
           )}
 
+          {/* SINALIZAÇÃO DE PUBLIEDITORIAL SE FOR PUBLI */}
+          {isPubli && article.sponsor && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 mb-6 flex items-center justify-between text-xs text-amber-900">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-amber-600 text-[20px]">
+                  verified
+                </span>
+                <span>
+                  <strong>Conteúdo Patrocinado:</strong> Este material é uma produção institucional apresentada por <strong>{article.sponsor.name}</strong>.
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* BYLINE / AUTOR & DATA */}
           <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-gray-200 text-xs sm:text-sm text-gray-500">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#0E1B2B] text-[#7afbae] flex items-center justify-center font-bold text-sm">
-                CF
-              </div>
+              {isArtigo && article.columnist ? (
+                <img
+                  src={article.columnist.avatarUrl}
+                  alt={article.columnist.name}
+                  className="w-11 h-11 rounded-full object-cover border-2 border-indigo-600 shadow"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-[#0E1B2B] text-[#7afbae] flex items-center justify-center font-bold text-sm">
+                  CF
+                </div>
+              )}
               <div className="flex flex-col">
-                <span className="font-bold text-[#0b1c30]">{article.author}</span>
+                <span className="font-bold text-[#0b1c30]">
+                  {isArtigo && article.columnist ? article.columnist.name : article.author}
+                </span>
                 <span className="text-xs text-gray-500">
                   {article.publishedAt} • {article.readTime}
                 </span>
@@ -150,32 +193,7 @@ export const ArticlePage: React.FC = () => {
               </div>
             </div>
 
-            {/* PLAYER DE ÁUDIO SE FOR PODCAST */}
-            {article.audio?.available && (
-              <div className="bg-[#0f1c2c] text-white p-5 rounded-2xl flex items-center justify-between shadow-lg">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#23B26D] text-white flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[28px]">podcasts</span>
-                  </div>
-                  <div>
-                    <div className="text-xs uppercase tracking-wider text-[#7afbae] font-bold">
-                      {article.audio.episodeNumber}
-                    </div>
-                    <div className="text-base font-bold">{article.audio.title}</div>
-                    <div className="text-xs text-gray-400">{article.audio.duration}</div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => alert('Reproduzindo episódio do Conexões Cast...')}
-                  className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-[#7afbae] text-xs font-bold uppercase tracking-wider transition-colors"
-                >
-                  Ouvir Áudio
-                </button>
-              </div>
-            )}
-
-            {/* PARÁGRAFOS DA NOTÍCIA */}
+            {/* PARÁGRAFOS DA PUBLICAÇÃO */}
             <div className="prose prose-lg max-w-none text-[#1E293B] text-base sm:text-lg leading-relaxed space-y-6 pt-2">
               {article.content.map((p, idx) => (
                 <p key={idx} className="leading-relaxed">
@@ -183,19 +201,36 @@ export const ArticlePage: React.FC = () => {
                 </p>
               ))}
 
-              {/* Bloco de Citação em Destaque */}
               <blockquote className="border-l-4 border-[#006d3f] bg-[#eff4ff] p-5 rounded-r-xl my-6 not-italic font-medium text-[#0b1c30]">
-                "A consolidação de Goiás no cenário econômico nacional reflete o trabalho
-                incansável do produtor e os investimentos estratégicos em infraestrutura e
-                tecnologia de ponta."
+                "Informação confiável e conexão estratégica são os combustíveis que impulsionam o
+                desenvolvimento de Goiás."
               </blockquote>
-
-              <p className="leading-relaxed">
-                Especialistas ouvidos pelo portal <strong>Conexões em FOCO</strong> reiteram que a
-                tendência para os próximos trimestres é de estabilidade nos custos dos insumos e
-                ampliação das rotas de exportação com destino aos mercados asiáticos e do Oriente Médio.
-              </p>
             </div>
+
+            {/* BOX DO COLUNISTA (SE FOR ARTIGO DE OPINIÃO) */}
+            {isArtigo && article.columnist && (
+              <div className="bg-[#f0f4ff] border border-[#d3e4fe] rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4 mt-6">
+                <img
+                  src={article.columnist.avatarUrl}
+                  alt={article.columnist.name}
+                  className="w-20 h-20 rounded-full object-cover border-2 border-indigo-600 shrink-0 shadow-md"
+                />
+                <div className="text-center sm:text-left">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded">
+                    COLUNISTA CONVIDADO
+                  </span>
+                  <h4 className="text-lg font-bold text-[#0b1c30] mt-1">
+                    {article.columnist.name}
+                  </h4>
+                  <p className="text-xs text-indigo-900 font-semibold mb-2">
+                    {article.columnist.role}
+                  </p>
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    {article.columnist.bio}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* TAGS DA MATÉRIA */}
             <div className="pt-6 border-t border-gray-200">
@@ -203,41 +238,24 @@ export const ArticlePage: React.FC = () => {
                 Palavras-chave relacionadas:
               </span>
               <div className="flex flex-wrap gap-2">
-                {['Agronegócio', 'Goiás', 'Rio Verde', 'Economia Goiana', 'Mercado', 'Safra 2025'].map(
-                  (tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium cursor-pointer transition-colors"
-                    >
-                      #{tag}
-                    </span>
-                  )
-                )}
-              </div>
-            </div>
-
-            {/* BOX DE ENGAJAMENTO SOCIAL */}
-            <div className="bg-[#0E1B2B] text-white p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 shadow-md">
-              <div className="flex flex-col text-center sm:text-left">
-                <h4 className="text-base font-bold">Compartilhe esta informação</h4>
-                <p className="text-xs text-gray-400">
-                  Ajude a conectar mais pessoas e oportunidades em Goiás.
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleShareWhatsApp}
-                  className="px-5 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs font-bold tracking-wider uppercase transition-colors"
-                >
-                  Enviar no WhatsApp
-                </button>
+                {['Goiás', article.category, 'Notícias', 'Economia', 'Rio Verde'].map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium cursor-pointer transition-colors"
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </div>
             </div>
           </article>
 
           {/* COLUNA DIREITA: SIDEBAR (4 COLS) */}
-          <aside className="lg:col-span-4 flex flex-col gap-8 w-full">
-            {/* WIDGET COTAÇÕES RÁPIDAS */}
+          <aside className="lg:col-span-4 flex flex-col gap-6 w-full">
+            {/* ESPAÇO PUBLICITÁRIO SIDEBAR */}
+            <AdBanner type="sidebar" onOpenAdModal={onOpenAdModal} />
+
+            {/* WIDGET COTAÇÕES MODELO CANAL RURAL */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
                 <div className="flex items-center gap-2">
@@ -253,12 +271,14 @@ export const ArticlePage: React.FC = () => {
                 </span>
               </div>
               <div className="space-y-3">
-                {mockQuotes.map((q) => (
+                {mockQuotes.slice(0, 5).map((q) => (
                   <div
                     key={q.id}
                     className="flex items-center justify-between py-1.5 border-b border-gray-50 text-xs"
                   >
-                    <span className="text-gray-600 font-medium">{q.name}</span>
+                    <span className="text-gray-600 font-medium truncate max-w-[140px]">
+                      {q.name}
+                    </span>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[#0b1c30]">{q.value}</span>
                       {q.variation && (
@@ -283,7 +303,7 @@ export const ArticlePage: React.FC = () => {
                   local_fire_department
                 </span>
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0b1c30]">
-                  Mais Lidas
+                  Mais Lidas da Semana
                 </h3>
               </div>
               <div className="space-y-4">
@@ -309,30 +329,11 @@ export const ArticlePage: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* MINI BOLETIM CARD */}
-            <div className="bg-[#eff4ff] border border-[#dce9ff] rounded-2xl p-6 text-center">
-              <span className="material-symbols-outlined text-3xl text-[#006d3f] mb-2">
-                mark_email_unread
-              </span>
-              <h4 className="text-sm font-extrabold text-[#0b1c30] uppercase mb-1">
-                Boletim Conexões VIP
-              </h4>
-              <p className="text-xs text-gray-600 mb-4">
-                Receba resumos de negócios e cotações de Goiás todas as manhãs no seu e-mail.
-              </p>
-              <Link
-                to="/#boletim"
-                className="block w-full py-2.5 rounded-xl bg-[#006d3f] text-white font-bold text-xs uppercase tracking-wider hover:bg-[#00522e] transition-colors"
-              >
-                Cadastrar Grátis
-              </Link>
-            </div>
           </aside>
         </div>
 
-        {/* SEÇÃO INFERIOR: LEIA TAMBÉM / MATÉRIAS RELACIONADAS */}
-        <section className="mt-16 pt-10 border-t border-gray-200">
+        {/* SEÇÃO INFERIOR: LEIA TAMBÉM */}
+        <section className="mt-14 pt-10 border-t border-gray-200">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-2.5 h-6 rounded bg-[#006d3f]"></div>
@@ -341,7 +342,7 @@ export const ArticlePage: React.FC = () => {
               </h2>
             </div>
             <Link
-              to="/categoria/todas"
+              to="/categoria/noticias"
               className="text-xs font-bold uppercase tracking-wider text-[#006d3f] hover:underline"
             >
               Ver mais notícias &rarr;

@@ -1,68 +1,68 @@
 import React, { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getArticlesByCategory, allArticles } from '../data/mockNews';
+import { AdBanner } from '../components/AdBanner';
 
-export const CategoryPage: React.FC = () => {
+interface CategoryPageProps {
+  onOpenAdModal?: () => void;
+}
+
+export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  const categoryName = (slug || 'noticias').toUpperCase();
+  const rawSlug = (slug || 'noticias').toLowerCase().trim();
 
   const categoryMeta: Record<string, { title: string; desc: string; icon: string }> = {
-    AGRO: {
+    agro: {
       title: 'Agro & Agronegócios',
       desc: 'Inteligência de safras, tecnologia de precisão, insumos e o dia a dia do produtor rural goiano.',
       icon: 'potted_plant',
     },
-    ECONOMIA: {
+    cidade: {
+      title: 'Cidade & Polos Regionais',
+      desc: 'Infraestrutura urbana, desenvolvimento regional e acontecimentos em Rio Verde, Jataí, Goiânia e Anápolis.',
+      icon: 'location_city',
+    },
+    politica: {
+      title: 'Política Estadual',
+      desc: 'Decisões do governo, legislação, políticas públicas e o impacto das medidas estaduais no setor produtivo.',
+      icon: 'policy',
+    },
+    'saude-e-bem-estar': {
+      title: 'Saúde e Bem-Estar',
+      desc: 'Medicina preventiva, longevidade, qualidade de vida, avanços hospitalares e saúde ocupacional.',
+      icon: 'health_and_safety',
+    },
+    economia: {
       title: 'Economia & Negócios',
-      desc: 'Indicadores financeiros, investimentos industriais e desenvolvimento econômico no Centro-Oeste.',
+      desc: 'Indicadores financeiros, cotações, investimentos industriais e crescimento econômico no Centro-Oeste.',
       icon: 'analytics',
     },
-    REGIAO: {
-      title: 'Região & Cidades',
-      desc: 'Acontecimentos dos principais polos: Rio Verde, Jataí, Anápolis, Goiânia e Cristalina.',
-      icon: 'pin_drop',
+    'geo-politica': {
+      title: 'Geo Política & Mercado Global',
+      desc: 'Relações internacionais, balança comercial, exportações para a Ásia e o posicionamento de Goiás no mundo.',
+      icon: 'public',
     },
-    REGIÃO: {
-      title: 'Região & Cidades',
-      desc: 'Acontecimentos dos principais polos: Rio Verde, Jataí, Anápolis, Goiânia e Cristalina.',
-      icon: 'pin_drop',
-    },
-    ENTREVISTAS: {
-      title: 'Entrevistas & Podcasts',
-      desc: 'Conversas aprofundadas com lideranças, pesquisadores e executivos que transformam Goiás.',
-      icon: 'mic',
-    },
-    EVENTOS: {
-      title: 'Eventos & Feiras',
-      desc: 'Agenda das principais feiras de tecnologia, exposições agropecuárias e rodadas de negócios.',
-      icon: 'event',
-    },
-    NOTICIAS: {
-      title: 'Todas as Notícias',
-      desc: 'Acompanhe a cobertura editorial completa do portal Conexões em FOCO.',
-      icon: 'newspaper',
-    },
-    NOTÍCIAS: {
+    noticias: {
       title: 'Todas as Notícias',
       desc: 'Acompanhe a cobertura editorial completa do portal Conexões em FOCO.',
       icon: 'newspaper',
     },
   };
 
-  const currentMeta = categoryMeta[categoryName] || {
-    title: `Editoria: ${categoryName}`,
+  const currentMeta = categoryMeta[rawSlug] || {
+    title: `Editoria: ${rawSlug.toUpperCase()}`,
     desc: 'Notícias e análises selecionadas pela equipe do Conexões em FOCO.',
     icon: 'article',
   };
 
   const articles = useMemo(() => {
-    if (categoryName === 'NOTICIAS' || categoryName === 'NOTÍCIAS' || categoryName === 'TODAS') {
+    if (rawSlug === 'noticias' || rawSlug === 'todas') {
       return allArticles;
     }
-    return getArticlesByCategory(categoryName);
-  }, [categoryName]);
+    return getArticlesByCategory(rawSlug);
+  }, [rawSlug]);
 
   return (
     <div className="w-full bg-[#F8FAFC] py-8 sm:py-12">
@@ -78,7 +78,7 @@ export const CategoryPage: React.FC = () => {
         </div>
 
         {/* BANNER DA CATEGORIA */}
-        <div className="bg-[#0E1B2B] text-white rounded-2xl p-6 sm:p-10 mb-10 shadow-lg border border-white/10 relative overflow-hidden">
+        <div className="bg-[#0E1B2B] text-white rounded-2xl p-6 sm:p-10 mb-8 shadow-lg border border-white/10 relative overflow-hidden">
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#7afbae] text-xs font-bold uppercase tracking-wider mb-3">
               <span className="material-symbols-outlined text-[16px]">{currentMeta.icon}</span>
@@ -98,12 +98,15 @@ export const CategoryPage: React.FC = () => {
           </div>
         </div>
 
+        {/* ESPAÇO PUBLICITÁRIO DE CATEGORIA */}
+        <AdBanner type="leaderboard" onOpenAdModal={onOpenAdModal} className="mb-8" />
+
         {/* GRADE DE ARTIGOS */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-2.5 h-6 rounded bg-[#006d3f]"></div>
             <h2 className="text-lg sm:text-xl font-extrabold text-[#0b1c30] uppercase tracking-tight">
-              Matérias Publicadas ({articles.length})
+              Publicações Recentes ({articles.length})
             </h2>
           </div>
         </div>
@@ -129,12 +132,35 @@ export const CategoryPage: React.FC = () => {
                       alt={art.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded bg-[#0E1B2B]/90 text-white text-[10px] font-bold uppercase tracking-wider">
-                      {art.category}
+                    <span
+                      className={`absolute top-3 left-3 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white ${
+                        art.contentType === 'publi'
+                          ? 'bg-amber-600'
+                          : art.contentType === 'artigo'
+                          ? 'bg-indigo-900'
+                          : 'bg-[#0E1B2B]/90'
+                      }`}
+                    >
+                      {art.contentType === 'publi'
+                        ? 'INFORME PUBLICITÁRIO'
+                        : art.contentType === 'artigo'
+                        ? 'ARTIGO DE OPINIÃO'
+                        : art.category}
                     </span>
                   </div>
 
                   <div className="p-5 flex flex-col gap-2">
+                    {art.columnist && (
+                      <span className="text-[11px] text-indigo-900 font-bold">
+                        Por {art.columnist.name}
+                      </span>
+                    )}
+                    {art.sponsor && (
+                      <span className="text-[11px] text-amber-800 font-bold">
+                        Patrocinado por {art.sponsor.name}
+                      </span>
+                    )}
+
                     <h3 className="text-base font-bold text-[#0b1c30] group-hover:text-[#006d3f] transition-colors line-clamp-2 leading-snug">
                       {art.title}
                     </h3>
@@ -147,7 +173,7 @@ export const CategoryPage: React.FC = () => {
                 <div className="px-5 py-3 bg-[#f8f9ff] flex items-center justify-between text-xs text-gray-400 border-t border-gray-100">
                   <span>{art.publishedAt}</span>
                   <span className="text-[#006d3f] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    Ler matéria <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                    Ler conteúdo <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                   </span>
                 </div>
               </article>

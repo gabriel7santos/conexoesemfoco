@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HeroSection } from '../components/HeroSection';
 import { TopicsRail } from '../components/TopicsRail';
+import { WeatherSectionCanalRural } from '../components/WeatherSectionCanalRural';
 import { NewsGrid } from '../components/NewsGrid';
 import { SpecialHubsSection } from '../components/SpecialHubsSection';
 import { AdBanner } from '../components/AdBanner';
@@ -75,7 +76,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenAdModal }) => {
           onSelectTopic={(topic) => setSelectedTopic(topic)}
         />
 
-        {/* GRADE EDITORIAL DE NOTÍCIAS, ARTIGOS E PUBLIS */}
+        {/* SEÇÃO DO TEMPO MODELO CANAL RURAL (PREVISÃO DE CHUVAS 7 DIAS + TENDÊNCIA 7 MESES) */}
+        <WeatherSectionCanalRural />
+
+        {/* GRADE EDITORIAL DE NOTÍCIAS, ARTIGOS E COTAÇÕES DO CANAL RURAL */}
         <NewsGrid
           articles={displayedArticles}
           onArticleClick={handleArticleClick}

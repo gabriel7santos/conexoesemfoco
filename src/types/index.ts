@@ -79,6 +79,29 @@ export interface WeatherInfo {
   humidity?: string;
 }
 
+export interface DayForecast {
+  date: string; // Ex: '17/10'
+  dayOfWeek: string; // Ex: 'Sáb'
+  rainMm: number; // Ex: 6.4
+  rainProb: number; // Ex: 47
+  tempMax: number; // Ex: 28
+  tempMin: number; // Ex: 19
+}
+
+export interface CityWeatherData {
+  city: string;
+  state: string;
+  temp: number;
+  tempMax: number;
+  tempMin: number;
+  condition: string;
+  rainProb: number;
+  rainMm: number;
+  windSpeed: string;
+  windDirection: string;
+  sevenDays: DayForecast[];
+}
+
 export interface EventItem {
   id: string;
   title: string;

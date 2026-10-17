@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Compass, MapPin } from 'lucide-react';
 
 interface FooterProps {
   onOpenAdModal?: () => void;
@@ -14,9 +15,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdModal }) => {
           <div className="lg:col-span-4 flex flex-col gap-4">
             <Link to="/" className="flex items-center gap-3">
               <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 border border-white/20">
-                <span className="material-symbols-outlined text-[#7afbae] text-[22px]">
-                  my_location
-                </span>
+                <Compass className="w-5 h-5 text-[#7afbae]" />
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-xl uppercase tracking-tight font-extrabold text-white">
@@ -34,9 +33,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdModal }) => {
             </p>
 
             <div className="flex items-center gap-2 text-gray-400 text-xs pt-1">
-              <span className="material-symbols-outlined text-[18px] text-[#7afbae]">
-                location_on
-              </span>
+              <MapPin className="w-4 h-4 text-[#7afbae] shrink-0" />
               <span>Av. Dep. Jamel Cecílio, Jardim Goiás, Goiânia – GO</span>
             </div>
 

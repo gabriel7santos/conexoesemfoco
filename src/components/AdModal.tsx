@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { X, Megaphone, CheckCircle } from 'lucide-react';
 
 interface AdModalProps {
   isOpen: boolean;
@@ -47,13 +48,13 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
           aria-label="Fechar"
         >
-          <span className="material-symbols-outlined text-[24px]">close</span>
+          <X className="w-5 h-5" />
         </button>
 
         {/* HEADER MODAL */}
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-xl bg-[#0E1B2B] text-[#7afbae] flex items-center justify-center shadow-md">
-            <span className="material-symbols-outlined text-[28px]">campaign</span>
+            <Megaphone className="w-6 h-6" />
           </div>
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#006d3f] bg-emerald-50 px-2 py-0.5 rounded">
@@ -92,19 +93,19 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
           </h4>
           <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
             <div className="flex items-center gap-1.5 p-2 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="material-symbols-outlined text-[#006d3f] text-[16px]">check_circle</span>
+              <CheckCircle className="w-4 h-4 text-[#006d3f] shrink-0" />
               <span>Superbanner Topo (Desktop & Mobile)</span>
             </div>
             <div className="flex items-center gap-1.5 p-2 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="material-symbols-outlined text-[#006d3f] text-[16px]">check_circle</span>
+              <CheckCircle className="w-4 h-4 text-[#006d3f] shrink-0" />
               <span>Publieditorial / Matéria Patrocinada</span>
             </div>
             <div className="flex items-center gap-1.5 p-2 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="material-symbols-outlined text-[#006d3f] text-[16px]">check_circle</span>
+              <CheckCircle className="w-4 h-4 text-[#006d3f] shrink-0" />
               <span>Banners Laterais nas Matérias</span>
             </div>
             <div className="flex items-center gap-1.5 p-2 rounded-lg bg-gray-50 border border-gray-100">
-              <span className="material-symbols-outlined text-[#006d3f] text-[16px]">check_circle</span>
+              <CheckCircle className="w-4 h-4 text-[#006d3f] shrink-0" />
               <span>Patrocínio do Ticker de Cotações</span>
             </div>
           </div>

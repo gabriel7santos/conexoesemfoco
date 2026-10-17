@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Building2, Scale, Calendar, ArrowRight } from 'lucide-react';
 import { mockEvents } from '../data/mockNews';
 
 export const SpecialHubsSection: React.FC = () => {
@@ -26,7 +27,7 @@ export const SpecialHubsSection: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <span className="w-10 h-10 rounded-xl bg-[#0E1B2B] text-[#7afbae] flex items-center justify-center font-bold">
-                <span className="material-symbols-outlined text-[24px]">corporate_fare</span>
+                <Building2 className="w-6 h-6 text-[#7afbae]" />
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#006d3f] bg-emerald-50 px-2 py-0.5 rounded">
                 HUB B2B
@@ -50,7 +51,7 @@ export const SpecialHubsSection: React.FC = () => {
             className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-[#0E1B2B] hover:bg-[#162B42] text-white text-xs font-bold uppercase tracking-wider transition-all"
           >
             <span>Acessar Ambiente Empresarial</span>
-            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -59,7 +60,7 @@ export const SpecialHubsSection: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <span className="w-10 h-10 rounded-xl bg-[#006d3f] text-white flex items-center justify-center font-bold">
-                <span className="material-symbols-outlined text-[24px]">balance</span>
+                <Scale className="w-6 h-6 text-white" />
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#001d32] bg-blue-50 px-2 py-0.5 rounded">
                 COLUNAS JURÍDICAS
@@ -83,7 +84,7 @@ export const SpecialHubsSection: React.FC = () => {
             className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-[#006d3f] hover:bg-[#00522e] text-white text-xs font-bold uppercase tracking-wider transition-all"
           >
             <span>Acessar Conexão com a Lei</span>
-            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -92,7 +93,7 @@ export const SpecialHubsSection: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <span className="w-10 h-10 rounded-xl bg-[#4178A7] text-white flex items-center justify-center font-bold">
-                <span className="material-symbols-outlined text-[24px]">calendar_month</span>
+                <Calendar className="w-6 h-6 text-white" />
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded">
                 CALENDÁRIO GOIÁS
@@ -107,7 +108,7 @@ export const SpecialHubsSection: React.FC = () => {
             <div className="space-y-2 mb-4">
               {mockEvents.slice(0, 2).map((ev) => (
                 <div key={ev.id} className="flex items-center gap-2 text-xs text-gray-700 bg-[#f8f9ff] p-2 rounded-lg border border-gray-100">
-                  <span className="material-symbols-outlined text-[16px] text-[#006d3f]">event</span>
+                  <Calendar className="w-4 h-4 text-[#006d3f] shrink-0" />
                   <span className="font-bold truncate">{ev.title}</span>
                   <span className="text-[10px] text-gray-400 shrink-0 ml-auto">{ev.date}</span>
                 </div>
@@ -119,7 +120,7 @@ export const SpecialHubsSection: React.FC = () => {
             className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-[#4178A7] hover:bg-[#346289] text-white text-xs font-bold uppercase tracking-wider transition-all"
           >
             <span>Ver Agenda Completa</span>
-            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

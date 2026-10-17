@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Sun } from 'lucide-react';
 import { mockQuotes } from '../data/mockNews';
 import { fetchLiveWeather } from '../services/weatherService';
 import { WeatherInfo } from '../types';
@@ -68,9 +69,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAdModal }) => {
         <div className="hidden lg:flex items-center gap-4 shrink-0 pl-4 border-l border-white/10 text-gray-300 text-[11.5px]">
           {/* Previsão do Tempo Dinâmica */}
           <div className="flex items-center gap-2" title="Previsão do tempo em tempo real">
-            <span className="material-symbols-outlined text-[16px] text-amber-400">
-              wb_sunny
-            </span>
+            <Sun className="w-4 h-4 text-amber-400 shrink-0" />
             <span>
               <strong>{currentWeather.city}</strong> {currentWeather.temp} • {currentWeather.condition}
             </span>

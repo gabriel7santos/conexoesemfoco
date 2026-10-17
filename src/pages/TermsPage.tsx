@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Home, FileText } from 'lucide-react';
 
 export const TermsPage: React.FC = () => {
   return (
@@ -8,7 +9,7 @@ export const TermsPage: React.FC = () => {
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
           <Link to="/" className="hover:text-[#006d3f] transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-[15px]">home</span>
+            <Home className="w-3.5 h-3.5" />
             <span>Início</span>
           </Link>
           <span>/</span>
@@ -18,7 +19,7 @@ export const TermsPage: React.FC = () => {
         <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-gray-200">
           <div className="flex items-center gap-3 pb-6 border-b border-gray-100 mb-6">
             <div className="w-12 h-12 rounded-xl bg-[#0E1B2B] text-[#7afbae] flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[28px]">description</span>
+              <FileText className="w-6 h-6 text-[#7afbae]" />
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#006d3f]">

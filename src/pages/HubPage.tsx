@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Home, ArrowRight, Building2, Scale } from 'lucide-react';
 import { getArticlesByHub, allArticles } from '../data/mockNews';
 
 export const HubPage: React.FC = () => {
@@ -11,7 +12,7 @@ export const HubPage: React.FC = () => {
   const hubSubtitle = isEmpresarial
     ? 'O hub de negócios, empresas de Goiás, cases corporativos e oportunidades B2B.'
     : 'Artigos jurídicos, compliance no agronegócio e orientações de advogados especialistas.';
-  const hubIcon = isEmpresarial ? 'corporate_fare' : 'balance';
+  const HubIcon = isEmpresarial ? Building2 : Scale;
   const hubColor = isEmpresarial ? '#0E1B2B' : '#006d3f';
 
   const hubArticles = getArticlesByHub(isEmpresarial ? 'empresarial' : 'lei');
@@ -27,7 +28,7 @@ export const HubPage: React.FC = () => {
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
           <Link to="/" className="hover:text-[#006d3f] transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-[15px]">home</span>
+            <Home className="w-3.5 h-3.5" />
             <span>Início</span>
           </Link>
           <span>/</span>
@@ -41,7 +42,7 @@ export const HubPage: React.FC = () => {
         >
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#7afbae] text-xs font-bold uppercase tracking-wider mb-3">
-              <span className="material-symbols-outlined text-[16px]">{hubIcon}</span>
+              <HubIcon className="w-4 h-4 text-[#7afbae]" />
               <span>Ambiente Especial Conexões</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
@@ -51,8 +52,8 @@ export const HubPage: React.FC = () => {
               {hubSubtitle}
             </p>
           </div>
-          <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-10 translate-y-10">
-            <span className="material-symbols-outlined text-[240px] text-white">{hubIcon}</span>
+          <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-8 translate-y-8">
+            <HubIcon className="w-64 h-64 text-white" />
           </div>
         </div>
 
@@ -106,7 +107,7 @@ export const HubPage: React.FC = () => {
               <div className="px-5 py-3 bg-[#f8f9ff] flex items-center justify-between text-xs text-gray-400 border-t border-gray-100">
                 <span>{art.publishedAt}</span>
                 <span className="text-[#006d3f] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Ler análise <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                  Ler análise <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
             </article>

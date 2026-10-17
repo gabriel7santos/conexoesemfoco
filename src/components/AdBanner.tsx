@@ -1,4 +1,5 @@
 import React from 'react';
+import { TrendingUp } from 'lucide-react';
 
 interface AdBannerProps {
   type?: 'leaderboard' | 'sidebar' | 'in-feed';
@@ -52,9 +53,7 @@ export const AdBanner: React.FC<AdBannerProps> = ({
           PUBLICIDADE
         </span>
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[#7afbae] text-[22px]">
-            trending_up
-          </span>
+          <TrendingUp className="text-[#7afbae] w-5 h-5 shrink-0" />
           <div className="text-center sm:text-left">
             <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#7afbae] transition-colors">
               Espaço Publicitário em Destaque • Conexões em FOCO

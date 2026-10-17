@@ -1,5 +1,18 @@
 import React, { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import {
+  Home,
+  ArrowRight,
+  Sprout,
+  Building,
+  Landmark,
+  HeartPulse,
+  TrendingUp,
+  Globe2,
+  Newspaper,
+  FileText,
+  LucideIcon,
+} from 'lucide-react';
 import { getArticlesByCategory, allArticles } from '../data/mockNews';
 import { AdBanner } from '../components/AdBanner';
 
@@ -13,49 +26,51 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => 
 
   const rawSlug = (slug || 'noticias').toLowerCase().trim();
 
-  const categoryMeta: Record<string, { title: string; desc: string; icon: string }> = {
+  const categoryMeta: Record<string, { title: string; desc: string; Icon: LucideIcon }> = {
     agro: {
       title: 'Agro & Agronegócios',
       desc: 'Inteligência de safras, tecnologia de precisão, insumos e o dia a dia do produtor rural goiano.',
-      icon: 'potted_plant',
+      Icon: Sprout,
     },
     cidade: {
       title: 'Cidade & Polos Regionais',
       desc: 'Infraestrutura urbana, desenvolvimento regional e acontecimentos em Rio Verde, Jataí, Goiânia e Anápolis.',
-      icon: 'location_city',
+      Icon: Building,
     },
     politica: {
       title: 'Política Estadual',
       desc: 'Decisões do governo, legislação, políticas públicas e o impacto das medidas estaduais no setor produtivo.',
-      icon: 'policy',
+      Icon: Landmark,
     },
     'saude-e-bem-estar': {
       title: 'Saúde e Bem-Estar',
       desc: 'Medicina preventiva, longevidade, qualidade de vida, avanços hospitalares e saúde ocupacional.',
-      icon: 'health_and_safety',
+      Icon: HeartPulse,
     },
     economia: {
       title: 'Economia & Negócios',
       desc: 'Indicadores financeiros, cotações, investimentos industriais e crescimento econômico no Centro-Oeste.',
-      icon: 'analytics',
+      Icon: TrendingUp,
     },
     'geo-politica': {
       title: 'Geo Política & Mercado Global',
       desc: 'Relações internacionais, balança comercial, exportações para a Ásia e o posicionamento de Goiás no mundo.',
-      icon: 'public',
+      Icon: Globe2,
     },
     noticias: {
       title: 'Todas as Notícias',
       desc: 'Acompanhe a cobertura editorial completa do portal Conexões em FOCO.',
-      icon: 'newspaper',
+      Icon: Newspaper,
     },
   };
 
   const currentMeta = categoryMeta[rawSlug] || {
     title: `Editoria: ${rawSlug.toUpperCase()}`,
     desc: 'Notícias e análises selecionadas pela equipe do Conexões em FOCO.',
-    icon: 'article',
+    Icon: FileText,
   };
+
+  const CurrentIcon = currentMeta.Icon;
 
   const articles = useMemo(() => {
     if (rawSlug === 'noticias' || rawSlug === 'todas') {
@@ -70,7 +85,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => 
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
           <Link to="/" className="hover:text-[#006d3f] transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-[15px]">home</span>
+            <Home className="w-3.5 h-3.5" />
             <span>Início</span>
           </Link>
           <span>/</span>
@@ -81,7 +96,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => 
         <div className="bg-[#0E1B2B] text-white rounded-2xl p-6 sm:p-10 mb-8 shadow-lg border border-white/10 relative overflow-hidden">
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#7afbae] text-xs font-bold uppercase tracking-wider mb-3">
-              <span className="material-symbols-outlined text-[16px]">{currentMeta.icon}</span>
+              <CurrentIcon className="w-4 h-4 text-[#7afbae]" />
               <span>Editoria Oficial</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
@@ -91,10 +106,8 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => 
               {currentMeta.desc}
             </p>
           </div>
-          <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-10 translate-y-10">
-            <span className="material-symbols-outlined text-[240px] text-white">
-              {currentMeta.icon}
-            </span>
+          <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-8 translate-y-8">
+            <CurrentIcon className="w-64 h-64 text-white" />
           </div>
         </div>
 
@@ -173,7 +186,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => 
                 <div className="px-5 py-3 bg-[#f8f9ff] flex items-center justify-between text-xs text-gray-400 border-t border-gray-100">
                   <span>{art.publishedAt}</span>
                   <span className="text-[#006d3f] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    Ler conteúdo <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                    Ler conteúdo <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </article>

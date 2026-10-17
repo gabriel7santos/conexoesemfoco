@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { Search, X, ArrowRight } from 'lucide-react';
 import { TopBar } from './components/TopBar';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -87,7 +88,7 @@ const MainLayout: React.FC = () => {
             className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-6 overflow-hidden border border-gray-100 animate-fade-in"
           >
             <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
-              <span className="material-symbols-outlined text-[24px] text-[#006d3f]">search</span>
+              <Search className="w-6 h-6 text-[#006d3f] shrink-0" />
               <input
                 type="text"
                 autoFocus
@@ -100,7 +101,7 @@ const MainLayout: React.FC = () => {
                 onClick={() => setIsSearchOpen(false)}
                 className="text-gray-400 hover:text-gray-600 p-1"
               >
-                <span className="material-symbols-outlined text-[22px]">close</span>
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -127,9 +128,7 @@ const MainLayout: React.FC = () => {
                         {art.title}
                       </h4>
                     </div>
-                    <span className="material-symbols-outlined text-[18px] text-gray-400">
-                      arrow_forward
-                    </span>
+                    <ArrowRight className="w-4 h-4 text-gray-400 shrink-0" />
                   </div>
                 ))
               )}

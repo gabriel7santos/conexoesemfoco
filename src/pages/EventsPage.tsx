@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Home, Calendar, Clock, MapPin, ExternalLink } from 'lucide-react';
 import { mockEvents } from '../data/mockNews';
 
 export const EventsPage: React.FC = () => {
@@ -16,7 +17,7 @@ export const EventsPage: React.FC = () => {
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
           <Link to="/" className="hover:text-[#006d3f] transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-[15px]">home</span>
+            <Home className="w-3.5 h-3.5" />
             <span>Início</span>
           </Link>
           <span>/</span>
@@ -27,7 +28,7 @@ export const EventsPage: React.FC = () => {
         <div className="bg-gradient-to-r from-[#0E1B2B] via-[#1E3A5F] to-[#0E1B2B] text-white rounded-2xl p-6 sm:p-10 mb-8 shadow-lg border border-white/10 relative overflow-hidden">
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#7afbae] text-xs font-bold uppercase tracking-wider mb-3">
-              <span className="material-symbols-outlined text-[16px]">calendar_month</span>
+              <Calendar className="w-4 h-4 text-[#7afbae]" />
               <span>Calendário Oficial de Goiás</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
@@ -37,8 +38,8 @@ export const EventsPage: React.FC = () => {
               Fique por dentro das maiores feiras do agronegócio, fóruns empresariais, congressos jurídicos e eventos de destaque em Rio Verde, Goiânia, Jataí e região.
             </p>
           </div>
-          <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-10 translate-y-10">
-            <span className="material-symbols-outlined text-[240px] text-white">event</span>
+          <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-8 translate-y-8">
+            <Calendar className="w-64 h-64 text-white" />
           </div>
         </div>
 
@@ -77,9 +78,7 @@ export const EventsPage: React.FC = () => {
                     {ev.category}
                   </span>
                   <div className="absolute bottom-3 right-3 px-3 py-1 rounded-lg bg-black/80 backdrop-blur-sm text-white text-xs font-bold flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[15px] text-[#7afbae]">
-                      calendar_today
-                    </span>
+                    <Calendar className="w-3.5 h-3.5 text-[#7afbae]" />
                     <span>{ev.date}</span>
                   </div>
                 </div>
@@ -94,15 +93,11 @@ export const EventsPage: React.FC = () => {
 
                   <div className="pt-3 border-t border-gray-100 space-y-1.5 text-xs text-gray-600">
                     <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[16px] text-[#006d3f]">
-                        schedule
-                      </span>
+                      <Clock className="w-4 h-4 text-[#006d3f]" />
                       <span>{ev.time}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[16px] text-red-500">
-                        location_on
-                      </span>
+                      <MapPin className="w-4 h-4 text-red-500" />
                       <span className="font-semibold text-gray-800">
                         {ev.location} — {ev.city}
                       </span>
@@ -118,7 +113,7 @@ export const EventsPage: React.FC = () => {
                   className="w-full py-2.5 rounded-xl bg-[#f8f9ff] hover:bg-[#006d3f] text-[#006d3f] hover:text-white border border-gray-200 hover:border-transparent text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
                 >
                   <span>Mais Detalhes do Evento</span>
-                  <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                  <ExternalLink className="w-4 h-4" />
                 </button>
               </div>
             </div>

@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
+  FileText,
+  Home,
+  CheckCircle2,
+  Check,
+  Copy,
+  TrendingUp,
+  Flame,
+  ChevronRight,
+} from 'lucide-react';
+import {
   getArticleById,
   getRelatedArticles,
   allArticles,
@@ -22,9 +32,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
   if (!article) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-        <span className="material-symbols-outlined text-6xl text-gray-300 mb-4">
-          article
-        </span>
+        <FileText className="w-16 h-16 text-gray-300 mb-4" />
         <h1 className="text-2xl font-extrabold text-[#0b1c30] mb-2">
           Publicação não encontrada
         </h1>
@@ -67,7 +75,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
         {/* BREADCRUMBS */}
         <nav className="flex items-center gap-2 text-xs text-gray-500 mb-6 overflow-x-auto whitespace-nowrap">
           <Link to="/" className="hover:text-[#006d3f] transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-[15px]">home</span>
+            <Home className="w-3.5 h-3.5" />
             <span>Início</span>
           </Link>
           <span>/</span>
@@ -119,9 +127,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
           {isPubli && article.sponsor && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 mb-6 flex items-center justify-between text-xs text-amber-900">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-amber-600 text-[20px]">
-                  verified
-                </span>
+                <CheckCircle2 className="w-5 h-5 text-amber-600 shrink-0" />
                 <span>
                   <strong>Conteúdo Patrocinado:</strong> Este material é uma produção institucional apresentada por <strong>{article.sponsor.name}</strong>.
                 </span>
@@ -167,9 +173,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
                 type="button"
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold transition-all shadow-sm"
               >
-                <span className="material-symbols-outlined text-[16px]">
-                  {copied ? 'check' : 'content_copy'}
-                </span>
+                {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                 <span>{copied ? 'Copiado!' : 'Copiar Link'}</span>
               </button>
             </div>
@@ -259,9 +263,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#006d3f] text-[20px]">
-                    trending_up
-                  </span>
+                  <TrendingUp className="w-5 h-5 text-[#006d3f]" />
                   <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0b1c30]">
                     Cotações de Goiás
                   </h3>
@@ -299,9 +301,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
             {/* MAIS LIDAS */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center gap-2 pb-3 border-b border-gray-100 mb-4">
-                <span className="material-symbols-outlined text-[#006d3f] text-[20px]">
-                  local_fire_department
-                </span>
+                <Flame className="w-5 h-5 text-[#006d3f]" />
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0b1c30]">
                   Mais Lidas da Semana
                 </h3>
@@ -376,7 +376,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
                 <div className="px-5 pb-4 text-xs text-gray-400 flex items-center justify-between">
                   <span>{rel.publishedAt}</span>
                   <span className="text-[#006d3f] font-semibold flex items-center gap-0.5">
-                    Ler <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+                    Ler <ChevronRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </div>

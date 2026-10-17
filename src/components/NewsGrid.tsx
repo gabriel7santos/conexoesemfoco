@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { Article } from '../types';
 
 interface NewsGridProps {
@@ -84,7 +85,7 @@ export const NewsGrid: React.FC<NewsGridProps> = ({ articles, onArticleClick }) 
                   {/* Se for Publi, exibe o Patrocinador */}
                   {isPubli && article.sponsor && (
                     <div className="flex items-center gap-1.5 text-[11px] text-amber-800 font-semibold bg-amber-50 px-2 py-1 rounded">
-                      <span className="material-symbols-outlined text-[14px]">verified</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                       <span>Patrocinado por: {article.sponsor.name}</span>
                     </div>
                   )}
@@ -114,7 +115,7 @@ export const NewsGrid: React.FC<NewsGridProps> = ({ articles, onArticleClick }) 
                 <span>{article.publishedAt}</span>
                 <span className="text-[#006d3f] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                   {isArtigo ? 'Ler artigo' : isPubli ? 'Conhecer mais' : 'Ler matéria'}
-                  <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
             </article>

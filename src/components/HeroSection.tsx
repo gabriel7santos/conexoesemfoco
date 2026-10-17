@@ -1,4 +1,5 @@
 import React from 'react';
+import { Sprout, Clock, BookOpen, ArrowRight } from 'lucide-react';
 import { Article } from '../types';
 
 interface HeroSectionProps {
@@ -30,7 +31,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div className="relative z-10 flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#006d3f] text-white text-[12px] uppercase tracking-wider font-bold shadow-sm">
-                <span className="material-symbols-outlined text-[15px]">eco</span>
+                <Sprout className="w-4 h-4 shrink-0" />
                 {mainArticle.category}
               </span>
               {mainArticle.highlightTag && (
@@ -54,16 +55,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="flex flex-wrap items-center justify-between gap-4 pt-3 mt-1 border-t border-white/10">
               <div className="flex items-center gap-3 text-gray-300 text-xs sm:text-sm">
                 <span className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[16px] text-[#7afbae]">
-                    schedule
-                  </span>
+                  <Clock className="w-4 h-4 text-[#7afbae] shrink-0" />
                   {mainArticle.publishedAt}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[16px] text-[#7afbae]">
-                    menu_book
-                  </span>
+                  <BookOpen className="w-4 h-4 text-[#7afbae] shrink-0" />
                   {mainArticle.readTime}
                 </span>
               </div>
@@ -73,7 +70,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/15 hover:bg-[#23B26D] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md group-hover:bg-[#23B26D]"
               >
                 <span>LER MATÉRIA</span>
-                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -109,7 +106,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   {article.title}
                 </h2>
                 <div className="flex items-center gap-2 text-gray-400 text-xs mt-1">
-                  <span className="material-symbols-outlined text-[15px]">timer</span>
+                  <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                   <span>
                     {article.publishedAt} • {article.author}
                   </span>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ShieldCheck } from 'lucide-react';
 
 export const LgpdBanner: React.FC = () => {
   const [visible, setVisible] = useState(false);
@@ -24,9 +25,7 @@ export const LgpdBanner: React.FC = () => {
     <div className="fixed bottom-0 left-0 right-0 z-50 p-3 sm:p-4 bg-[#0E1B2B]/95 backdrop-blur-md text-white border-t border-white/10 shadow-2xl animate-slide-up">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-start gap-3">
-          <span className="material-symbols-outlined text-[#7afbae] text-[24px] shrink-0 mt-0.5">
-            shield_lock
-          </span>
+          <ShieldCheck className="text-[#7afbae] w-6 h-6 shrink-0 mt-0.5" />
           <div className="text-xs text-gray-300 leading-relaxed">
             <strong className="text-white">Privacidade e Proteção de Dados (LGPD):</strong> Utilizamos cookies e tecnologias semelhantes para personalizar a sua experiência no portal Conexões em FOCO, analisar o tráfego e exibir conteúdos relevantes, de acordo com a nossa{' '}
             <Link to="/privacidade-lgpd" className="text-[#7afbae] underline hover:text-white">

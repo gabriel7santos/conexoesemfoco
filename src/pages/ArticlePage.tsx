@@ -17,6 +17,7 @@ import {
   mockQuotes,
 } from '../data/mockNews';
 import { AdBanner } from '../components/AdBanner';
+import { MarketQuotesCanalRural } from '../components/MarketQuotesCanalRural';
 
 interface ArticlePageProps {
   onOpenAdModal?: () => void;
@@ -260,43 +261,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
             <AdBanner type="sidebar" onOpenAdModal={onOpenAdModal} />
 
             {/* WIDGET COTAÇÕES MODELO CANAL RURAL */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#006d3f]" />
-                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0b1c30]">
-                    Cotações de Goiás
-                  </h3>
-                </div>
-                <span className="text-[10px] font-bold text-[#23B26D] bg-emerald-50 px-2 py-0.5 rounded">
-                  AO VIVO
-                </span>
-              </div>
-              <div className="space-y-3">
-                {mockQuotes.slice(0, 5).map((q) => (
-                  <div
-                    key={q.id}
-                    className="flex items-center justify-between py-1.5 border-b border-gray-50 text-xs"
-                  >
-                    <span className="text-gray-600 font-medium truncate max-w-[140px]">
-                      {q.name}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#0b1c30]">{q.value}</span>
-                      {q.variation && (
-                        <span
-                          className={`text-[11px] font-semibold ${
-                            q.isPositive ? 'text-[#23B26D]' : 'text-red-500'
-                          }`}
-                        >
-                          {q.variation}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <MarketQuotesCanalRural maxHeight="max-h-[380px]" />
 
             {/* MAIS LIDAS */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">

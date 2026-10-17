@@ -59,11 +59,14 @@ export interface Article {
 export interface MarketQuote {
   id: string;
   name: string;
+  fullName?: string;
+  code?: string;
   label?: string;
   value: string;
   variation?: string;
   isPositive?: boolean;
   marketPlace?: string;
+  category?: 'fisico' | 'futuro' | 'cambio';
   isHighlight?: boolean;
 }
 

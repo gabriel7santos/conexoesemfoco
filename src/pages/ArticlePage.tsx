@@ -17,6 +17,7 @@ import {
   mockQuotes,
 } from '../data/mockNews';
 import { AdBanner } from '../components/AdBanner';
+import { SquareBanner, mockSquareAds } from '../components/SquareBanner';
 import { MarketQuotesCanalRural } from '../components/MarketQuotesCanalRural';
 
 interface ArticlePageProps {
@@ -294,6 +295,14 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
                 ))}
               </div>
             </div>
+
+            {/* SEGUNDO BANNER QUADRADO NA SIDEBAR */}
+            <SquareBanner
+              ad={mockSquareAds[2]}
+              onOpenAdModal={onOpenAdModal}
+              aspect="mrec"
+              className="w-full"
+            />
           </aside>
         </div>
 

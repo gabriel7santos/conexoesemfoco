@@ -7,6 +7,7 @@ import { NewsGrid } from '../components/NewsGrid';
 import { SpecialHubsSection } from '../components/SpecialHubsSection';
 import { SponsorsCarousel } from '../components/SponsorsCarousel';
 import { AdBanner } from '../components/AdBanner';
+import { SquareBannersSection } from '../components/SquareBannersSection';
 import {
   mainFeaturedArticle,
   secondaryLeadArticles,
@@ -61,10 +62,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenAdModal }) => {
   return (
     <div className="w-full">
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 w-full">
-        {/* ESPAÇO PUBLICITÁRIO: SUPERBANNER TOPO (EXEMPLO COMIGO SAFRA) */}
+        {/* ESPAÇO PUBLICITÁRIO: SUPERBANNER ROTATIVO (MOSTRA VÁRIOS ANUNCIANTES RODANDO COM LOGOS REAIS) */}
         <AdBanner
           type="leaderboard"
-          variant="comigo"
+          variant="rotating"
           onOpenAdModal={onOpenAdModal}
           className="mb-6"
         />
@@ -91,10 +92,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenAdModal }) => {
           onArticleClick={handleArticleClick}
         />
 
-        {/* ESPAÇO PUBLICITÁRIO IN-FEED (EXEMPLO SICOOB CREDI-RURAL) */}
-        <AdBanner
-          type="leaderboard"
-          variant="sicoob"
+        {/* VITRINE DE BANNERS QUADRADOS (MREC 300x300 DAS PRINCIPAIS MARCAS DE GOIÁS) */}
+        <SquareBannersSection
           onOpenAdModal={onOpenAdModal}
           className="mb-10"
         />

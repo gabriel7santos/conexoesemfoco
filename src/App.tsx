@@ -38,8 +38,8 @@ const MainLayout: React.FC = () => {
     <div className="bg-[#f8f9ff] font-sans text-[#0b1c30] min-h-screen flex flex-col antialiased">
       <ScrollToTop />
 
-      {/* HEADER FIXO SUPERIOR COM COTAÇÕES E CLIMA */}
-      <header className="fixed top-0 left-0 right-0 z-40 w-full shadow-[0_8px_24px_-4px_rgba(14,27,43,0.12)]">
+      {/* HEADER SUPERIOR PADRÃO (NÃO FIXO) COM COTAÇÕES E CLIMA */}
+      <header className="w-full shadow-sm">
         <TopBar onOpenAdModal={() => setIsAdModalOpen(true)} />
         <Header
           onSearchClick={() => setIsSearchOpen(true)}
@@ -47,8 +47,8 @@ const MainLayout: React.FC = () => {
         />
       </header>
 
-      {/* ÁREA DE CONTEÚDO PRINCIPAL COM PADDING TOP PARA COMPENSAR O HEADER FIXO */}
-      <main className="w-full flex-1 pt-[116px] bg-[#F8FAFC]">
+      {/* ÁREA DE CONTEÚDO PRINCIPAL EM FLUXO NORMAL */}
+      <main className="w-full flex-1 bg-[#F8FAFC]">
         <Routes>
           <Route path="/" element={<HomePage onOpenAdModal={() => setIsAdModalOpen(true)} />} />
           <Route

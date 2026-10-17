@@ -5,6 +5,7 @@ import { TopicsRail } from '../components/TopicsRail';
 import { WeatherSectionCanalRural } from '../components/WeatherSectionCanalRural';
 import { NewsGrid } from '../components/NewsGrid';
 import { SpecialHubsSection } from '../components/SpecialHubsSection';
+import { SponsorsCarousel } from '../components/SponsorsCarousel';
 import { AdBanner } from '../components/AdBanner';
 import {
   mainFeaturedArticle,
@@ -60,8 +61,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenAdModal }) => {
   return (
     <div className="w-full">
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 w-full">
-        {/* ESPAÇO PUBLICITÁRIO: SUPERBANNER TOPO */}
-        <AdBanner type="leaderboard" onOpenAdModal={onOpenAdModal} className="mb-6" />
+        {/* ESPAÇO PUBLICITÁRIO: SUPERBANNER TOPO (EXEMPLO COMIGO SAFRA) */}
+        <AdBanner
+          type="leaderboard"
+          variant="comigo"
+          onOpenAdModal={onOpenAdModal}
+          className="mb-6"
+        />
 
         {/* SEÇÃO HERO (MANCHETE PRINCIPAL + 2 CARDS SECUNDÁRIOS) */}
         <HeroSection
@@ -85,11 +91,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenAdModal }) => {
           onArticleClick={handleArticleClick}
         />
 
-        {/* ESPAÇO PUBLICITÁRIO IN-FEED */}
-        <AdBanner type="leaderboard" onOpenAdModal={onOpenAdModal} className="mb-10" />
+        {/* ESPAÇO PUBLICITÁRIO IN-FEED (EXEMPLO SICOOB CREDI-RURAL) */}
+        <AdBanner
+          type="leaderboard"
+          variant="sicoob"
+          onOpenAdModal={onOpenAdModal}
+          className="mb-10"
+        />
 
         {/* SEÇÃO ESPECIAL DOS 3 AMBIENTES (CONEXÃO EMPRESARIAL, COM A LEI, AGENDA DE EVENTOS) */}
         <SpecialHubsSection />
+
+        {/* CARROSSEL DE ANUNCIANTES & MARCAS PARCEIRAS + FAIXA COMERCIAL WHATSAPP */}
+        <SponsorsCarousel onOpenAdModal={onOpenAdModal} className="mt-4" />
       </div>
     </div>
   );

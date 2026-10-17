@@ -13,18 +13,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdModal }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 mb-12">
           {/* Coluna 1: Marca, Endereço & Redes Sociais (4 cols) */}
           <div className="lg:col-span-4 flex flex-col gap-4">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 border border-white/20">
-                <Compass className="w-5 h-5 text-[#7afbae]" />
-              </div>
-              <div className="flex flex-col leading-none">
-                <span className="text-xl uppercase tracking-tight font-extrabold text-white">
-                  CONEXÕES
-                </span>
-                <span className="text-[10px] uppercase tracking-[0.22em] text-[#7afbae] font-bold">
-                  EM FOCO • GOIÁS
-                </span>
-              </div>
+            {/* LOGO OFICIAL CONEXÕES EM FOCO */}
+            <Link to="/" className="flex items-center shrink-0 group py-1">
+              <img
+                src="/conexoes_logo_clean.png"
+                alt="Conexões em FOCO"
+                className="h-12 w-auto object-contain group-hover:scale-[1.02] transition-transform"
+              />
             </Link>
 
             <p className="text-gray-400 text-xs sm:text-sm leading-relaxed max-w-sm">

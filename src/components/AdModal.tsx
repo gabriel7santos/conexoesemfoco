@@ -51,18 +51,24 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
           <X className="w-5 h-5" />
         </button>
 
-        {/* HEADER MODAL */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-[#0E1B2B] text-[#7afbae] flex items-center justify-center shadow-md">
-            <Megaphone className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#006d3f] bg-emerald-50 px-2 py-0.5 rounded">
-              MÍDIA KIT & PUBLICIDADE
-            </span>
-            <h3 className="text-xl sm:text-2xl font-extrabold text-[#0b1c30]">
-              Anuncie no Conexões em FOCO
-            </h3>
+        {/* HEADER MODAL COM LOGO REAL */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#0E1B2B] px-2.5 py-1.5 rounded-xl border border-white/10 shadow-sm flex items-center justify-center shrink-0">
+              <img
+                src="/conexoes_logo_clean.png"
+                alt="Conexões em FOCO"
+                className="h-7 w-auto object-contain"
+              />
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#006d3f] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                MÍDIA KIT OFICIAL 2026/2027
+              </span>
+              <h3 className="text-lg sm:text-xl font-extrabold text-[#0b1c30]">
+                Anuncie no Conexões em FOCO
+              </h3>
+            </div>
           </div>
         </div>
 

@@ -63,19 +63,13 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick, onOpenAdModal }) 
   return (
     <div className="w-full bg-[#0E1B2B] text-white border-b border-white/10 relative z-30">
       <div className="max-w-7xl mx-auto px-4 lg:px-8 h-20 flex items-center justify-between gap-4">
-        {/* LOGO */}
-        <Link to="/" className="flex items-center gap-3 shrink-0 group">
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 border border-white/20 group-hover:border-[#23B26D] transition-colors">
-            <Compass className="w-6 h-6 text-[#7afbae]" />
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-xl sm:text-2xl uppercase tracking-tight font-extrabold text-white">
-              CONEXÕES
-            </span>
-            <span className="text-[10px] uppercase tracking-[0.22em] text-[#7afbae] font-bold">
-              EM FOCO • GOIÁS
-            </span>
-          </div>
+        {/* LOGO OFICIAL CONEXÕES EM FOCO */}
+        <Link to="/" className="flex items-center shrink-0 group py-1">
+          <img
+            src="/conexoes_logo_clean.png"
+            alt="Conexões em FOCO"
+            className="h-10 sm:h-12 w-auto object-contain group-hover:scale-[1.02] transition-transform"
+          />
         </Link>
 
         {/* NAVEGAÇÃO DESKTOP: CATEGORIAS OFICIAIS */}
@@ -177,7 +171,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick, onOpenAdModal }) 
           {onOpenAdModal && (
             <button
               onClick={onOpenAdModal}
-              className="hidden sm:inline-flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white border border-[#23B26D] bg-[#23B26D]/20 hover:bg-[#23B26D] px-3.5 py-2 rounded-xl transition-all shadow-sm whitespace-nowrap"
+              className="hidden sm:inline-flex items-center justify-center text-xs font-extrabold uppercase tracking-wider text-white bg-[#23B26D] hover:bg-[#1fa162] px-4 py-2 rounded-xl transition-all shadow-sm whitespace-nowrap border border-[#23B26D]"
               type="button"
             >
               ANUNCIE AQUI

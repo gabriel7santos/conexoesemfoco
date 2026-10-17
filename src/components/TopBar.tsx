@@ -122,13 +122,15 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAdModal }) => {
             </a>
           </div>
 
-          {/* Botão Anuncie Conosco */}
+          {/* Link Discreto de Mídia Kit (evita duplicação com o botão principal do Header) */}
           {onOpenAdModal && (
             <button
               onClick={onOpenAdModal}
-              className="text-[11px] font-bold text-[#7afbae] hover:text-white uppercase tracking-wider bg-white/10 hover:bg-[#23B26D] px-2.5 py-1 rounded transition-colors"
+              className="text-[11px] font-bold text-[#7afbae] hover:text-white uppercase tracking-wider flex items-center gap-1 hover:underline ml-1 py-0.5 px-1.5 rounded hover:bg-white/10 transition-colors"
+              title="Mídia Kit & Publicidade Conexões em FOCO"
             >
-              Anuncie Aqui
+              <span>Mídia Kit</span>
+              <span className="text-xs">↗</span>
             </button>
           )}
         </div>

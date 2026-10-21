@@ -683,7 +683,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               type="button"
               onClick={confirmInsertImageInText}
               disabled={!imageUrlInput.trim()}
-              className="px-4 py-2 rounded-xl bg-[#23B26D] hover:bg-[#1fa162] disabled:opacity-40 text-white text-xs font-extrabold uppercase tracking-wider shadow-xs cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-[#23B26D] hover:bg-[#1fa162] disabled:opacity-40 text-white text-xs font-extrabold uppercase tracking-wider shadow-sm cursor-pointer"
             >
               Confirmar e Inserir Foto
             </button>
@@ -694,7 +694,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       {/* FOLHA DE REDAÇÃO (ESTILO DOCUMENTO EDITORIAL) */}
       {previewMode ? (
         <div className="p-6 sm:p-10 min-h-[420px] bg-slate-50/50">
-          <div className="max-w-3xl mx-auto bg-white p-8 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="max-w-3xl mx-auto bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm">
             <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#006d3f] mb-4 pb-2 border-b border-slate-100">
               Simulação Fiel da Página de Leitura
             </div>

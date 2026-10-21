@@ -425,7 +425,7 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F7FA] flex flex-col lg:flex-row font-sans text-[#0b1c30] antialiased">
+    <div className="min-h-screen bg-[#F4F7FA] flex flex-col md:flex-row font-sans text-[#0b1c30] antialiased">
       {/* NOTIFICAÇÃO TOAST EXECUTIVA */}
       {toastMsg && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#08121E] text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-[#23B26D]/40 flex items-center gap-3 text-xs font-bold tracking-wide animate-fade-in">
@@ -437,7 +437,7 @@ export const AdminDashboardPage: React.FC = () => {
       )}
 
       {/* SIDEBAR EXECUTIVA REFINADA */}
-      <aside className="w-full lg:w-68 bg-[#08111D] text-white flex flex-col justify-between shrink-0 border-r border-white/10 select-none">
+      <aside className="w-full md:w-72 md:sticky md:top-0 md:h-screen md:overflow-y-auto bg-[#08111D] text-white flex flex-col justify-between shrink-0 border-r border-white/10 select-none">
         <div>
           {/* BRAND HEADER */}
           <div className="px-6 py-5 border-b border-white/[0.07] flex items-center justify-between">
@@ -703,7 +703,7 @@ export const AdminDashboardPage: React.FC = () => {
         <main className="flex-1 p-5 sm:p-8 max-w-7xl w-full mx-auto">
           {isEditingArticle ? (
             /* EDITOR ESTILO WORD COMPLETO */
-            <div className="bg-white rounded-3xl shadow-xs border border-slate-200/90 p-6 sm:p-8 space-y-6">
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-200/90 p-6 sm:p-8 space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <button
@@ -2158,7 +2158,7 @@ export const AdminDashboardPage: React.FC = () => {
                         onClick={() => setAdSubTab('leaderboard')}
                         className={`px-4 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
                           adSubTab === 'leaderboard'
-                            ? 'bg-[#08111D] text-white shadow-xs'
+                            ? 'bg-[#08111D] text-white shadow-sm'
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                         }`}
                       >
@@ -2169,7 +2169,7 @@ export const AdminDashboardPage: React.FC = () => {
                         onClick={() => setAdSubTab('square')}
                         className={`px-4 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
                           adSubTab === 'square'
-                            ? 'bg-[#08111D] text-white shadow-xs'
+                            ? 'bg-[#08111D] text-white shadow-sm'
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                         }`}
                       >

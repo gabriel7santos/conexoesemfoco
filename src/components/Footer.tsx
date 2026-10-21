@@ -166,12 +166,18 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdModal }) => {
         {/* Linha Inferior com Copyright e Links Jurídicos LGPD */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>© 2026 Conexões em FOCO Comunicação Ltda. Todos os direitos reservados. Goiânia / Rio Verde – Goiás.</p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-6">
             <Link to="/termos-de-uso" className="hover:text-white transition-colors">
               Termos de Uso
             </Link>
             <Link to="/privacidade-lgpd" className="hover:text-white transition-colors">
               Política de Privacidade & LGPD
+            </Link>
+            <Link
+              to="/admin"
+              className="text-[#7afbae] hover:text-white font-bold transition-colors"
+            >
+              Painel Admin
             </Link>
           </div>
         </div>

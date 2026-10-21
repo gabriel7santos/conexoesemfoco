@@ -1,11 +1,12 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Home, ArrowRight, Building2, Scale } from 'lucide-react';
-import { getArticlesByHub, allArticles } from '../data/mockNews';
+import { usePortalData } from '../context/PortalDataContext';
 
 export const HubPage: React.FC = () => {
   const { type } = useParams<{ type: string }>();
   const navigate = useNavigate();
+  const { getArticlesByHub, articles: allArticles } = usePortalData();
 
   const isEmpresarial = type === 'empresarial';
   const hubTitle = isEmpresarial ? 'Conexão Empresarial' : 'Conexão com a Lei';
@@ -16,11 +17,12 @@ export const HubPage: React.FC = () => {
   const hubColor = isEmpresarial ? '#0E1B2B' : '#006d3f';
 
   const hubArticles = getArticlesByHub(isEmpresarial ? 'empresarial' : 'lei');
-  // Se tiver poucos, adiciona mais da categoria relacionada
   const displayArticles =
     hubArticles.length > 0
       ? hubArticles
-      : allArticles.filter((a) => (isEmpresarial ? a.category === 'Economia' : a.category === 'Política'));
+      : allArticles.filter((a) =>
+          isEmpresarial ? a.category === 'Economia' : a.category === 'Política'
+        );
 
   return (
     <div className="w-full bg-[#F8FAFC] py-8 sm:py-12">

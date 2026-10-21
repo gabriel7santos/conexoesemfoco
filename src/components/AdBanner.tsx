@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  TrendingUp,
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Pause,
-  Play,
 } from 'lucide-react';
 import {
   ComigoLogo,
@@ -15,14 +12,15 @@ import {
   OcbGoLogo,
   SolutecLogo,
 } from './SponsorLogos';
-import { SquareBanner, mockSquareAds } from './SquareBanner';
+import { SquareBanner, resolveLogoComponent } from './SquareBanner';
+import { usePortalData } from '../context/PortalDataContext';
 
 interface AdBannerProps {
   type?: 'leaderboard' | 'sidebar' | 'in-feed' | 'square';
   variant?: 'rotating' | 'comigo' | 'sicoob' | 'default';
   onOpenAdModal?: () => void;
   className?: string;
-  autoRotateInterval?: number; // em ms, padrão 5000 (5s)
+  autoRotateInterval?: number;
 }
 
 interface LeaderboardSlide {
@@ -35,6 +33,7 @@ interface LeaderboardSlide {
   ctaClass: string;
   bgGradient: string;
   borderColor: string;
+  targetUrl?: string;
   Logo: React.FC<{ className?: string }>;
 }
 
@@ -111,24 +110,6 @@ export const leaderboardSlides: LeaderboardSlide[] = [
     borderColor: 'border-sky-500/40 hover:border-sky-300',
     Logo: SolutecLogo,
   },
-  {
-    id: 'anuncie-aqui',
-    tag: 'ESPAÇO PUBLICITÁRIO',
-    brandName: 'Conexões em FOCO',
-    headline: 'Posicione Sua Marca para Mais de 180.000 Decisores',
-    description: 'Liderança em jornalismo analítico, inteligência de mercado e agronegócio em Goiás e Centro-Oeste.',
-    ctaText: 'Anuncie Conosco',
-    ctaClass: 'bg-[#23B26D] hover:bg-[#1fa162] text-white',
-    bgGradient: 'from-[#0E1B2B] via-[#14263B] to-[#0E1B2B]',
-    borderColor: 'border-white/20 hover:border-[#23B26D]',
-    Logo: () => (
-      <img
-        src="/conexoes_logo_clean.png"
-        alt="Conexões em FOCO"
-        className="h-7 w-auto object-contain"
-      />
-    ),
-  },
 ];
 
 export const AdBanner: React.FC<AdBannerProps> = ({
@@ -138,7 +119,8 @@ export const AdBanner: React.FC<AdBannerProps> = ({
   className = '',
   autoRotateInterval = 5500,
 }) => {
-  // Se for o formato de banner quadrado direto
+  const { banners } = usePortalData();
+
   if (type === 'square') {
     return (
       <SquareBanner
@@ -149,7 +131,6 @@ export const AdBanner: React.FC<AdBannerProps> = ({
     );
   }
 
-  // Se for na lateral (sidebar) das matérias
   if (type === 'sidebar') {
     return (
       <div className={`space-y-4 ${className}`}>
@@ -164,8 +145,24 @@ export const AdBanner: React.FC<AdBannerProps> = ({
     );
   }
 
-  // BANNER HORIZONTAL ROTATIVO (LEADERBOARD AUTOMÁTICO)
-  // Mostra um anunciante por vez, rodando automaticamente a cada X segundos
+  const dbSlides: LeaderboardSlide[] = banners
+    .filter((b) => b.adType === 'leaderboard' && b.isActive)
+    .map((b) => ({
+      id: b.id,
+      tag: b.tag,
+      brandName: b.brandName,
+      headline: b.headline,
+      description: b.description,
+      ctaText: b.ctaText,
+      ctaClass: b.ctaColor || 'bg-[#23B26D] hover:bg-[#1fa162] text-white',
+      bgGradient: b.gradientBg || 'from-[#00381e] via-[#004e28] to-[#0b2417]',
+      borderColor: b.borderColor || 'border-[#23B26D]/50 hover:border-[#7afbae]',
+      targetUrl: b.targetUrl,
+      Logo: resolveLogoComponent(b.logoKey, b.logoUrl),
+    }));
+
+  const slidesPool = dbSlides.length > 0 ? dbSlides : leaderboardSlides;
+
   const [currentSlide, setCurrentSlide] = useState(() => {
     if (variant === 'comigo') return 0;
     if (variant === 'sicoob') return 1;
@@ -174,55 +171,58 @@ export const AdBanner: React.FC<AdBannerProps> = ({
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    // Se for variante estática fixa, não roda automaticamente
     if (variant === 'comigo' || variant === 'sicoob') return;
 
     const timer = setInterval(() => {
       if (!isPaused) {
-        setCurrentSlide((prev) => (prev + 1) % leaderboardSlides.length);
+        setCurrentSlide((prev) => (prev + 1) % slidesPool.length);
       }
     }, autoRotateInterval);
 
     return () => clearInterval(timer);
-  }, [isPaused, autoRotateInterval, variant]);
+  }, [isPaused, autoRotateInterval, variant, slidesPool.length]);
 
-  const slide = leaderboardSlides[currentSlide];
+  const slide = slidesPool[currentSlide % slidesPool.length] || leaderboardSlides[0];
   const LogoComponent = slide.Logo;
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentSlide((prev) => (prev - 1 + leaderboardSlides.length) % leaderboardSlides.length);
+    setCurrentSlide((prev) => (prev - 1 + slidesPool.length) % slidesPool.length);
   };
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentSlide((prev) => (prev + 1) % leaderboardSlides.length);
+    setCurrentSlide((prev) => (prev + 1) % slidesPool.length);
+  };
+
+  const handleBannerClick = () => {
+    if (slide.targetUrl && slide.targetUrl.trim()) {
+      window.open(slide.targetUrl.trim(), '_blank');
+    } else if (onOpenAdModal) {
+      onOpenAdModal();
+    }
   };
 
   return (
     <div
-      onClick={onOpenAdModal}
+      onClick={handleBannerClick}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       className={`relative w-full overflow-hidden rounded-2xl bg-gradient-to-r ${slide.bgGradient} text-white p-3.5 sm:p-4 border ${slide.borderColor} shadow-md cursor-pointer transition-all duration-700 group ${className}`}
       title={`${slide.brandName} • ${slide.headline}`}
     >
       <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-        {/* LADO ESQUERDO: TAG + LOGO REAL + TEXTOS */}
         <div className="flex flex-col sm:flex-row items-center sm:items-center gap-3.5 w-full lg:w-auto">
-          {/* TAG DA PUBLICIDADE */}
           <div className="flex items-center gap-2 self-start sm:self-center">
             <span className="text-[9px] uppercase tracking-widest text-[#7afbae] bg-black/50 px-2 py-1 rounded shrink-0 font-extrabold border border-white/10">
               {slide.tag}
             </span>
           </div>
 
-          {/* LOGO CORPORATIVO VETORIAL EM CARD BRANCO */}
           <div className="bg-white rounded-xl px-3 py-1.5 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform max-w-[150px]">
             <LogoComponent className="h-7 w-auto object-contain" />
           </div>
 
-          {/* HEADLINE & SUBTÍTULO */}
           <div className="text-center sm:text-left min-w-0">
             <h4 className="text-xs sm:text-sm font-extrabold text-white group-hover:text-[#7afbae] transition-colors leading-tight line-clamp-1">
               {slide.headline}
@@ -233,9 +233,7 @@ export const AdBanner: React.FC<AdBannerProps> = ({
           </div>
         </div>
 
-        {/* LADO DIREITO: CONTROLES DE ROTAÇÃO + BOTÃO CTA */}
         <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto w-full sm:w-auto justify-between sm:justify-end">
-          {/* CONTROLES DISCRETOS DE SLIDE (SETAS E NÚMERO) */}
           {variant !== 'comigo' && variant !== 'sicoob' && (
             <div
               className="flex items-center gap-1.5 bg-black/40 px-2 py-1 rounded-lg border border-white/10 text-gray-300 text-xs"
@@ -250,7 +248,7 @@ export const AdBanner: React.FC<AdBannerProps> = ({
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <span className="text-[10px] font-bold text-gray-300 px-1">
-                {currentSlide + 1}/{leaderboardSlides.length}
+                {(currentSlide % slidesPool.length) + 1}/{slidesPool.length}
               </span>
               <button
                 type="button"
@@ -263,7 +261,6 @@ export const AdBanner: React.FC<AdBannerProps> = ({
             </div>
           )}
 
-          {/* BOTÃO CALL TO ACTION */}
           <span
             className={`text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl transition-all shadow-xs flex items-center gap-1.5 ${slide.ctaClass}`}
           >
@@ -273,10 +270,9 @@ export const AdBanner: React.FC<AdBannerProps> = ({
         </div>
       </div>
 
-      {/* BARRA OU DOTS DE PROGRESSO DA ROTAÇÃO */}
       {variant !== 'comigo' && variant !== 'sicoob' && (
         <div className="flex items-center justify-center gap-1.5 mt-2.5 pt-1.5 border-t border-white/10">
-          {leaderboardSlides.map((item, dotIdx) => (
+          {slidesPool.map((item, dotIdx) => (
             <button
               key={item.id}
               onClick={(e) => {
@@ -285,7 +281,9 @@ export const AdBanner: React.FC<AdBannerProps> = ({
               }}
               aria-label={`Ver anúncio de ${item.brandName}`}
               className={`h-1 rounded-full transition-all ${
-                dotIdx === currentSlide ? 'w-6 bg-[#7afbae]' : 'w-2 bg-white/30 hover:bg-white/50'
+                dotIdx === currentSlide % slidesPool.length
+                  ? 'w-6 bg-[#7afbae]'
+                  : 'w-2 bg-white/30 hover:bg-white/50'
               }`}
             />
           ))}

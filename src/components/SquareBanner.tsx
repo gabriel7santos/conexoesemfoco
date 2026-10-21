@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Sparkles, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   ComigoLogo,
   SicoobLogo,
@@ -8,6 +8,7 @@ import {
   SolutecLogo,
   OcbGoLogo,
 } from './SponsorLogos';
+import { usePortalData } from '../context/PortalDataContext';
 
 export interface SquareAdItem {
   id: string;
@@ -20,7 +21,41 @@ export interface SquareAdItem {
   gradientBg: string;
   borderColor: string;
   bgImage?: string;
+  logoUrl?: string;
+  targetUrl?: string;
   LogoComponent: React.FC<{ className?: string }>;
+}
+
+const DefaultConexoesLogo: React.FC<{ className?: string }> = ({ className = 'h-7' }) => (
+  <img
+    src="/conexoes_logo_clean.png"
+    alt="Conexões em FOCO"
+    className={`${className} w-auto object-contain`}
+  />
+);
+
+export function resolveLogoComponent(logoKey?: string, logoUrl?: string): React.FC<{ className?: string }> {
+  if (logoUrl && logoUrl.trim()) {
+    return ({ className = 'h-8' }) => (
+      <img src={logoUrl} alt="Logo" className={`${className} w-auto object-contain`} />
+    );
+  }
+  switch (logoKey) {
+    case 'comigo':
+      return ComigoLogo;
+    case 'sicoob':
+      return SicoobLogo;
+    case 'johndeere':
+      return JohnDeereLogo;
+    case 'autorio':
+      return AutorioLogo;
+    case 'solutec':
+      return SolutecLogo;
+    case 'ocbgo':
+      return OcbGoLogo;
+    default:
+      return DefaultConexoesLogo;
+  }
 }
 
 export const mockSquareAds: SquareAdItem[] = [
@@ -53,7 +88,7 @@ export const mockSquareAds: SquareAdItem[] = [
   {
     id: 'sq-autorio',
     brandName: 'Autorio Chevrolet',
-    tag: 'CONDICÕES PRODUTOR RURAL',
+    tag: 'CONDIÇÕES PRODUTOR RURAL',
     headline: 'Nova Chevrolet S10 & Silverado 4x4',
     description: 'Bônus de fábrica, taxa reduzida e pronta entrega com desconto para CNPJ e Produtor.',
     ctaText: 'Ver Condições',
@@ -110,13 +145,9 @@ interface SquareBannerProps {
   intervalMs?: number;
   onOpenAdModal?: () => void;
   className?: string;
-  aspect?: 'square' | 'mrec'; // square = 1:1, mrec = 300x250
+  aspect?: 'square' | 'mrec';
 }
 
-/**
- * Banner Quadrado (IAB MREC / Square Ad 300x250 a 300x300)
- * Pode ser estático ou rotativo, com logotipo da marca, fundo fotográfico com overlay e CTA.
- */
 export const SquareBanner: React.FC<SquareBannerProps> = ({
   ad,
   autoRotate = false,
@@ -125,6 +156,27 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
   className = '',
   aspect = 'square',
 }) => {
+  const { banners } = usePortalData();
+  const dbSquareBanners: SquareAdItem[] = banners
+    .filter((b) => b.adType === 'square' && b.isActive)
+    .map((b) => ({
+      id: b.id,
+      brandName: b.brandName,
+      tag: b.tag,
+      headline: b.headline,
+      description: b.description,
+      ctaText: b.ctaText,
+      ctaColor: b.ctaColor || 'bg-[#23B26D] hover:bg-[#1fa162]',
+      gradientBg: b.gradientBg || 'from-[#002f1a] via-[#004e28] to-[#041a0f]',
+      borderColor: b.borderColor || 'border-[#23B26D]/40 hover:border-[#7afbae]',
+      bgImage: b.bgImage,
+      logoUrl: b.logoUrl,
+      targetUrl: b.targetUrl,
+      LogoComponent: resolveLogoComponent(b.logoKey, b.logoUrl),
+    }));
+
+  const pool = dbSquareBanners.length > 0 ? dbSquareBanners : mockSquareAds;
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -132,28 +184,36 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
     if (!autoRotate) return;
     const timer = setInterval(() => {
       if (!isPaused) {
-        setCurrentIndex((prev) => (prev + 1) % mockSquareAds.length);
+        setCurrentIndex((prev) => (prev + 1) % pool.length);
       }
     }, intervalMs);
     return () => clearInterval(timer);
-  }, [autoRotate, isPaused, intervalMs]);
+  }, [autoRotate, isPaused, intervalMs, pool.length]);
 
-  const activeAd = ad || mockSquareAds[currentIndex];
+  const activeAd = ad || pool[currentIndex % pool.length] || mockSquareAds[0];
   const Logo = activeAd.LogoComponent;
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentIndex((prev) => (prev + 1) % mockSquareAds.length);
+    setCurrentIndex((prev) => (prev + 1) % pool.length);
   };
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentIndex((prev) => (prev - 1 + mockSquareAds.length) % mockSquareAds.length);
+    setCurrentIndex((prev) => (prev - 1 + pool.length) % pool.length);
+  };
+
+  const handleBannerClick = () => {
+    if (activeAd.targetUrl && activeAd.targetUrl.trim()) {
+      window.open(activeAd.targetUrl.trim(), '_blank');
+    } else if (onOpenAdModal) {
+      onOpenAdModal();
+    }
   };
 
   return (
     <div
-      onClick={onOpenAdModal}
+      onClick={handleBannerClick}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       className={`group relative overflow-hidden rounded-2xl border ${activeAd.borderColor} shadow-md transition-all duration-500 cursor-pointer flex flex-col justify-between ${
@@ -161,7 +221,6 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
       } ${className}`}
       title={`${activeAd.brandName} • ${activeAd.headline}`}
     >
-      {/* IMAGEM DE FUNDO COM OVERLAY GRADIENTE ESCURO */}
       {activeAd.bgImage && (
         <img
           src={activeAd.bgImage}
@@ -171,13 +230,11 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
       )}
       <div className={`absolute inset-0 bg-gradient-to-b ${activeAd.gradientBg} opacity-95`}></div>
 
-      {/* CABEÇALHO DO BANNER QUADRADO */}
       <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between gap-2 border-b border-white/10">
         <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#7afbae] bg-black/50 px-2 py-0.5 rounded border border-white/10">
           {activeAd.tag}
         </span>
 
-        {/* NAVEGAÇÃO / CONTROLE SE FOR ROTATIVO */}
         {autoRotate && (
           <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
             <button
@@ -188,7 +245,7 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
             <span className="text-[10px] text-gray-300 font-bold">
-              {currentIndex + 1}/{mockSquareAds.length}
+              {(currentIndex % pool.length) + 1}/{pool.length}
             </span>
             <button
               onClick={handleNext}
@@ -201,9 +258,7 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
         )}
       </div>
 
-      {/* CENTRO: LOGO OFICIAL DA EMPRESA & TEXTOS EDITORIAIS */}
       <div className="relative z-10 p-4 sm:p-5 flex flex-col items-center text-center my-auto">
-        {/* LOGO DA MARCA EM CARD BRANCO NÍTIDO */}
         <div className="bg-white rounded-xl px-4 py-2 mb-3.5 shadow-md flex items-center justify-center w-auto max-w-[200px] group-hover:scale-105 transition-transform">
           <Logo className="h-8 sm:h-9 w-auto object-contain" />
         </div>
@@ -216,7 +271,6 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
         </p>
       </div>
 
-      {/* RODAPÉ DO BANNER QUADRADO: BOTÃO CTA */}
       <div className="relative z-10 p-4 sm:p-5 pt-0">
         <button
           type="button"
@@ -226,10 +280,9 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
         </button>
 
-        {/* INDICADOR DE DOTS SE FOR ROTATIVO */}
         {autoRotate && (
           <div className="flex items-center justify-center gap-1.5 mt-2.5">
-            {mockSquareAds.map((_, dotIdx) => (
+            {pool.map((_, dotIdx) => (
               <button
                 key={dotIdx}
                 onClick={(e) => {
@@ -238,7 +291,7 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
                 }}
                 aria-label={`Ir para anúncio ${dotIdx + 1}`}
                 className={`h-1.5 rounded-full transition-all ${
-                  dotIdx === currentIndex ? 'w-4 bg-[#7afbae]' : 'w-1.5 bg-white/30'
+                  dotIdx === currentIndex % pool.length ? 'w-4 bg-[#7afbae]' : 'w-1.5 bg-white/30'
                 }`}
               />
             ))}

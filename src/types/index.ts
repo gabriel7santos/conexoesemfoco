@@ -21,39 +21,44 @@ export interface Article {
   readTime: string;
   author: string;
   content: string[];
+  contentHtml?: string;
   isMainLead?: boolean;
   isSecondaryLead?: boolean;
   highlightTag?: string;
-  hubType?: 'empresarial' | 'lei' | 'eventos';
+  hubType?: 'empresarial' | 'lei' | 'eventos' | null;
   // Dados específicos para PUBLI
   sponsor?: {
     name: string;
     brandColor?: string;
     disclaimer?: string;
-  };
-  // Dados específicos para ARTIGO
+  } | null;
+  // Dados específicos para ARTIGO / CONEXÃO COM A LEI
   columnist?: {
     name: string;
     avatarUrl: string;
     role: string;
     bio: string;
-  };
+  } | null;
   audio?: {
     available: boolean;
     duration: string;
     episodeNumber?: string;
     title?: string;
-  };
+    audioUrl?: string;
+  } | null;
   metrics?: {
     label: string;
     value: string;
     trend?: string;
     trendType?: 'positive' | 'negative' | 'neutral';
-  };
+  } | null;
   locationRoute?: {
     title: string;
     route: string;
-  };
+  } | null;
+  viewsCount?: number;
+  isPublished?: boolean;
+  createdAt?: string;
 }
 
 export interface MarketQuote {
@@ -112,4 +117,37 @@ export interface EventItem {
   city: string;
   imageUrl: string;
   description: string;
+  linkUrl?: string;
+  isActive?: boolean;
+}
+
+export interface AdBannerRecord {
+  id: string;
+  adType: 'leaderboard' | 'square';
+  brandName: string;
+  tag: string;
+  headline: string;
+  description: string;
+  ctaText: string;
+  targetUrl?: string;
+  bgImage?: string;
+  logoUrl?: string;
+  logoKey?: string;
+  ctaColor?: string;
+  gradientBg?: string;
+  borderColor?: string;
+  displayOrder?: number;
+  isActive: boolean;
+}
+
+export interface LeadRecord {
+  id: string;
+  leadType: 'anunciante' | 'newsletter' | 'vip';
+  name?: string;
+  company?: string;
+  phone?: string;
+  email?: string;
+  interest?: string;
+  status: 'novo' | 'em_atendimento' | 'fechado';
+  createdAt: string;
 }

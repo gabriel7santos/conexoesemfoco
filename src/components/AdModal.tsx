@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Megaphone, CheckCircle } from 'lucide-react';
+import { X, CheckCircle } from 'lucide-react';
+import { usePortalData } from '../context/PortalDataContext';
 
 interface AdModalProps {
   isOpen: boolean;
@@ -7,6 +8,7 @@ interface AdModalProps {
 }
 
 export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
+  const { createLead } = usePortalData();
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
   const [phone, setPhone] = useState('');
@@ -15,8 +17,19 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await createLead({
+        leadType: 'anunciante',
+        name,
+        company,
+        phone,
+        interest,
+      });
+    } catch {
+      // Silencioso
+    }
     setSent(true);
     setTimeout(() => {
       setSent(false);

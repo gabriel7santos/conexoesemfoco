@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Calendar, Clock, MapPin, ExternalLink } from 'lucide-react';
-import { mockEvents } from '../data/mockNews';
+import { usePortalData } from '../context/PortalDataContext';
 
 export const EventsPage: React.FC = () => {
   const [filter, setFilter] = useState('Todos');
+  const { events } = usePortalData();
 
   const filteredEvents =
     filter === 'Todos'
-      ? mockEvents
-      : mockEvents.filter((ev) => ev.category.toLowerCase() === filter.toLowerCase());
+      ? events
+      : events.filter((ev) => ev.category.toLowerCase() === filter.toLowerCase());
 
   return (
     <div className="w-full bg-[#F8FAFC] py-8 sm:py-12">
@@ -45,7 +46,7 @@ export const EventsPage: React.FC = () => {
 
         {/* FILTROS DE CATEGORIA */}
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none">
-          {['Todos', 'Agro', 'Negócios', 'Institucional'].map((cat) => (
+          {['Todos', 'Agro', 'Negócios', 'Institucional', 'Cultura'].map((cat) => (
             <button
               key={cat}
               onClick={() => setFilter(cat)}
@@ -109,7 +110,11 @@ export const EventsPage: React.FC = () => {
               <div className="p-6 pt-0">
                 <button
                   type="button"
-                  onClick={() => alert(`Informações do evento: ${ev.title}\nLocal: ${ev.location}, ${ev.city}\nData: ${ev.date}`)}
+                  onClick={() =>
+                    alert(
+                      `Informações do evento: ${ev.title}\nLocal: ${ev.location}, ${ev.city}\nData: ${ev.date}`
+                    )
+                  }
                   className="w-full py-2.5 rounded-xl bg-[#f8f9ff] hover:bg-[#006d3f] text-[#006d3f] hover:text-white border border-gray-200 hover:border-transparent text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
                 >
                   <span>Mais Detalhes do Evento</span>

@@ -14,10 +14,13 @@ import { HubPage } from './pages/HubPage';
 import { EventsPage } from './pages/EventsPage';
 import { LgpdPage } from './pages/LgpdPage';
 import { TermsPage } from './pages/TermsPage';
-import { allArticles } from './data/mockNews';
+import { AdminLoginPage } from './pages/admin/AdminLoginPage';
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { PortalDataProvider, usePortalData } from './context/PortalDataContext';
 
 const MainLayout: React.FC = () => {
   const navigate = useNavigate();
+  const { articles: allArticles } = usePortalData();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAdModalOpen, setIsAdModalOpen] = useState(false);
@@ -32,13 +35,13 @@ const MainLayout: React.FC = () => {
         a.subtitle?.toLowerCase().includes(q) ||
         a.category.toLowerCase().includes(q)
     );
-  }, [searchQuery]);
+  }, [searchQuery, allArticles]);
 
   return (
     <div className="bg-[#f8f9ff] font-sans text-[#0b1c30] min-h-screen flex flex-col antialiased">
       <ScrollToTop />
 
-      {/* HEADER SUPERIOR PADRÃO (NÃO FIXO) COM COTAÇÕES E CLIMA */}
+      {/* HEADER SUPERIOR PADRÃO COM COTAÇÕES E CLIMA */}
       <header className="w-full shadow-sm">
         <TopBar onOpenAdModal={() => setIsAdModalOpen(true)} />
         <Header
@@ -63,7 +66,6 @@ const MainLayout: React.FC = () => {
           <Route path="/agenda-eventos" element={<EventsPage />} />
           <Route path="/privacidade-lgpd" element={<LgpdPage />} />
           <Route path="/termos-de-uso" element={<TermsPage />} />
-          {/* Rota de fallback */}
           <Route path="*" element={<HomePage onOpenAdModal={() => setIsAdModalOpen(true)} />} />
         </Routes>
       </main>
@@ -142,9 +144,15 @@ const MainLayout: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <MainLayout />
-    </BrowserRouter>
+    <PortalDataProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/*" element={<MainLayout />} />
+        </Routes>
+      </BrowserRouter>
+    </PortalDataProvider>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sun } from 'lucide-react';
-import { mockQuotes } from '../data/mockNews';
+import { usePortalData } from '../context/PortalDataContext';
 import { fetchLiveWeather } from '../services/weatherService';
 import { WeatherInfo } from '../types';
 
@@ -9,6 +9,7 @@ interface TopBarProps {
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ onOpenAdModal }) => {
+  const { quotes: mockQuotes } = usePortalData();
   const [weatherList, setWeatherList] = useState<WeatherInfo[]>([]);
 
   useEffect(() => {

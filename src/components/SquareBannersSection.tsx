@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUpRight, Sparkles } from 'lucide-react';
-import { SquareBanner, mockSquareAds } from './SquareBanner';
+import { SquareBanner, mockSquareAds, resolveLogoComponent, SquareAdItem } from './SquareBanner';
+import { usePortalData } from '../context/PortalDataContext';
 
 interface SquareBannersSectionProps {
   onOpenAdModal?: () => void;
@@ -8,20 +9,35 @@ interface SquareBannersSectionProps {
   limit?: number;
 }
 
-/**
- * Seção de Banners Quadrados (MREC / Square Ads) para a Home e páginas de editorias.
- * Exibe marcas parceiras em cards quadrados de alto impacto visual.
- */
 export const SquareBannersSection: React.FC<SquareBannersSectionProps> = ({
   onOpenAdModal,
   className = '',
   limit = 3,
 }) => {
-  const selectedAds = mockSquareAds.slice(0, limit);
+  const { banners } = usePortalData();
+  const dbSquareBanners: SquareAdItem[] = banners
+    .filter((b) => b.adType === 'square' && b.isActive)
+    .map((b) => ({
+      id: b.id,
+      brandName: b.brandName,
+      tag: b.tag,
+      headline: b.headline,
+      description: b.description,
+      ctaText: b.ctaText,
+      ctaColor: b.ctaColor || 'bg-[#23B26D] hover:bg-[#1fa162]',
+      gradientBg: b.gradientBg || 'from-[#002f1a] via-[#004e28] to-[#041a0f]',
+      borderColor: b.borderColor || 'border-[#23B26D]/40 hover:border-[#7afbae]',
+      bgImage: b.bgImage,
+      logoUrl: b.logoUrl,
+      targetUrl: b.targetUrl,
+      LogoComponent: resolveLogoComponent(b.logoKey, b.logoUrl),
+    }));
+
+  const pool = dbSquareBanners.length > 0 ? dbSquareBanners : mockSquareAds;
+  const selectedAds = pool.slice(0, limit);
 
   return (
     <section className={`w-full mb-12 ${className}`}>
-      {/* CABEÇALHO DA SEÇÃO DE BANNERS QUADRADOS */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-3 border-b border-gray-200">
         <div className="flex items-center gap-3">
           <div className="w-2.5 h-7 rounded bg-[#004E86]"></div>
@@ -53,7 +69,6 @@ export const SquareBannersSection: React.FC<SquareBannersSectionProps> = ({
         )}
       </div>
 
-      {/* GRADE DE BANNERS QUADRADOS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {selectedAds.map((ad) => (
           <SquareBanner

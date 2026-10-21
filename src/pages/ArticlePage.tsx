@@ -6,16 +6,10 @@ import {
   CheckCircle2,
   Check,
   Copy,
-  TrendingUp,
   Flame,
   ChevronRight,
 } from 'lucide-react';
-import {
-  getArticleById,
-  getRelatedArticles,
-  allArticles,
-  mockQuotes,
-} from '../data/mockNews';
+import { usePortalData } from '../context/PortalDataContext';
 import { AdBanner } from '../components/AdBanner';
 import { SquareBanner, mockSquareAds } from '../components/SquareBanner';
 import { MarketQuotesCanalRural } from '../components/MarketQuotesCanalRural';
@@ -28,6 +22,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  const { getArticleById, getRelatedArticles, articles } = usePortalData();
 
   const article = getArticleById(id || '');
 
@@ -55,7 +50,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
   const isPubli = article.contentType === 'publi';
 
   const relatedArticles = getRelatedArticles(article.id, article.category, 3);
-  const mostRead = allArticles.filter((a) => a.id !== article.id).slice(0, 4);
+  const mostRead = articles.filter((a) => a.id !== article.id).slice(0, 4);
 
   const handleShareWhatsApp = () => {
     const url = window.location.href;
@@ -93,7 +88,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
 
         {/* ARTIGO HEADER */}
         <header className="max-w-4xl mb-8">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
             {isPubli ? (
               <span className="px-3 py-1 rounded bg-amber-600 text-white text-[11px] uppercase tracking-wider font-extrabold shadow">
                 INFORME PUBLICITÁRIO
@@ -106,6 +101,24 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
               <span className="px-3 py-1 rounded bg-[#006d3f] text-white text-[11px] uppercase tracking-wider font-extrabold">
                 {article.category}
               </span>
+            )}
+
+            {article.hubType === 'empresarial' && (
+              <Link
+                to="/hub/empresarial"
+                className="px-2.5 py-1 rounded bg-[#0E1B2B] text-[#7afbae] text-[11px] uppercase tracking-wider font-bold"
+              >
+                Conexão Empresarial
+              </Link>
+            )}
+
+            {article.hubType === 'lei' && (
+              <Link
+                to="/hub/lei"
+                className="px-2.5 py-1 rounded bg-indigo-100 text-indigo-900 text-[11px] uppercase tracking-wider font-bold"
+              >
+                Conexão com a Lei
+              </Link>
             )}
 
             {article.highlightTag && (
@@ -131,7 +144,8 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-amber-600 shrink-0" />
                 <span>
-                  <strong>Conteúdo Patrocinado:</strong> Este material é uma produção institucional apresentada por <strong>{article.sponsor.name}</strong>.
+                  <strong>Conteúdo Patrocinado:</strong> Este material é uma produção institucional apresentada por{' '}
+                  <strong>{article.sponsor.name}</strong>.
                 </span>
               </div>
             </div>
@@ -140,7 +154,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
           {/* BYLINE / AUTOR & DATA */}
           <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-gray-200 text-xs sm:text-sm text-gray-500">
             <div className="flex items-center gap-3">
-              {isArtigo && article.columnist ? (
+              {article.columnist?.avatarUrl ? (
                 <img
                   src={article.columnist.avatarUrl}
                   alt={article.columnist.name}
@@ -153,7 +167,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
               )}
               <div className="flex flex-col">
                 <span className="font-bold text-[#0b1c30]">
-                  {isArtigo && article.columnist ? article.columnist.name : article.author}
+                  {article.columnist?.name || article.author}
                 </span>
                 <span className="text-xs text-gray-500">
                   {article.publishedAt} • {article.readTime}
@@ -199,23 +213,25 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
               </div>
             </div>
 
-            {/* PARÁGRAFOS DA PUBLICAÇÃO */}
-            <div className="prose prose-lg max-w-none text-[#1E293B] text-base sm:text-lg leading-relaxed space-y-6 pt-2">
-              {article.content.map((p, idx) => (
-                <p key={idx} className="leading-relaxed">
-                  {p}
-                </p>
-              ))}
+            {/* CORPO DA PUBLICAÇÃO (SUPORTA HTML RICO ESTILO WORD E PARÁGRAFOS) */}
+            {article.contentHtml ? (
+              <div
+                className="article-rich-content prose prose-lg max-w-none text-[#1E293B] text-base sm:text-lg leading-relaxed pt-2"
+                dangerouslySetInnerHTML={{ __html: article.contentHtml }}
+              />
+            ) : (
+              <div className="prose prose-lg max-w-none text-[#1E293B] text-base sm:text-lg leading-relaxed space-y-6 pt-2">
+                {article.content.map((p, idx) => (
+                  <p key={idx} className="leading-relaxed">
+                    {p}
+                  </p>
+                ))}
+              </div>
+            )}
 
-              <blockquote className="border-l-4 border-[#006d3f] bg-[#eff4ff] p-5 rounded-r-xl my-6 not-italic font-medium text-[#0b1c30]">
-                "Informação confiável e conexão estratégica são os combustíveis que impulsionam o
-                desenvolvimento de Goiás."
-              </blockquote>
-            </div>
-
-            {/* BOX DO COLUNISTA (SE FOR ARTIGO DE OPINIÃO) */}
-            {isArtigo && article.columnist && (
-              <div className="bg-[#f0f4ff] border border-[#d3e4fe] rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4 mt-6">
+            {/* BOX DO COLUNISTA (SE FOR ARTIGO DE OPINIÃO OU CONEXÃO COM A LEI) */}
+            {(isArtigo || article.hubType === 'lei') && article.columnist && (
+              <div className="bg-[#f0f4ff] border border-[#d3e4fe] rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4 mt-4">
                 <img
                   src={article.columnist.avatarUrl}
                   alt={article.columnist.name}
@@ -223,7 +239,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
                 />
                 <div className="text-center sm:text-left">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded">
-                    COLUNISTA CONVIDADO
+                    COLUNISTA / ESPECIALISTA
                   </span>
                   <h4 className="text-lg font-bold text-[#0b1c30] mt-1">
                     {article.columnist.name}

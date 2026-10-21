@@ -13,7 +13,7 @@ import {
   FileText,
   LucideIcon,
 } from 'lucide-react';
-import { getArticlesByCategory, allArticles } from '../data/mockNews';
+import { usePortalData } from '../context/PortalDataContext';
 import { AdBanner } from '../components/AdBanner';
 
 interface CategoryPageProps {
@@ -23,6 +23,7 @@ interface CategoryPageProps {
 export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { articles: allArticles, getArticlesByCategory } = usePortalData();
 
   const rawSlug = (slug || 'noticias').toLowerCase().trim();
 
@@ -77,7 +78,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => 
       return allArticles;
     }
     return getArticlesByCategory(rawSlug);
-  }, [rawSlug]);
+  }, [rawSlug, allArticles, getArticlesByCategory]);
 
   return (
     <div className="w-full bg-[#F8FAFC] py-8 sm:py-12">

@@ -1,9 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, Scale, Calendar, ArrowRight } from 'lucide-react';
-import { mockEvents } from '../data/mockNews';
+import { usePortalData } from '../context/PortalDataContext';
 
 export const SpecialHubsSection: React.FC = () => {
+  const { events, getArticlesByHub } = usePortalData();
+  const latestEmpresarial = getArticlesByHub('empresarial')[0];
+  const latestLei = getArticlesByHub('lei')[0];
+
   return (
     <section className="w-full mb-12">
       {/* HEADER DA SEÇÃO */}
@@ -42,7 +46,10 @@ export const SpecialHubsSection: React.FC = () => {
             <div className="bg-[#f8f9ff] rounded-lg p-3 text-xs border border-gray-100 mb-4">
               <strong className="text-[#0b1c30] block mb-1">Destaque Recente:</strong>
               <p className="text-gray-600 line-clamp-2">
-                "Gestão Estratégica: O novo perfil das empresas familiares e sucessão no agro de Goiás"
+                "
+                {latestEmpresarial?.title ||
+                  'Gestão Estratégica: O novo perfil das empresas familiares e sucessão no agro de Goiás'}
+                "
               </p>
             </div>
           </div>
@@ -75,7 +82,10 @@ export const SpecialHubsSection: React.FC = () => {
             <div className="bg-[#f8f9ff] rounded-lg p-3 text-xs border border-gray-100 mb-4">
               <strong className="text-[#0b1c30] block mb-1">Artigo em Foco:</strong>
               <p className="text-gray-600 line-clamp-2">
-                "Segurança Jurídica: Como blindar contratos agrários e mitigar riscos na safra"
+                "
+                {latestLei?.title ||
+                  'Segurança Jurídica: Como blindar contratos agrários e mitigar riscos na safra'}
+                "
               </p>
             </div>
           </div>
@@ -106,8 +116,11 @@ export const SpecialHubsSection: React.FC = () => {
               Calendário completo das grandes feiras do agronegócio, congressos técnicos, rodadas de negócios e eventos culturais da cidade e do estado.
             </p>
             <div className="space-y-2 mb-4">
-              {mockEvents.slice(0, 2).map((ev) => (
-                <div key={ev.id} className="flex items-center gap-2 text-xs text-gray-700 bg-[#f8f9ff] p-2 rounded-lg border border-gray-100">
+              {events.slice(0, 2).map((ev) => (
+                <div
+                  key={ev.id}
+                  className="flex items-center gap-2 text-xs text-gray-700 bg-[#f8f9ff] p-2 rounded-lg border border-gray-100"
+                >
                   <Calendar className="w-4 h-4 text-[#006d3f] shrink-0" />
                   <span className="font-bold truncate">{ev.title}</span>
                   <span className="text-[10px] text-gray-400 shrink-0 ml-auto">{ev.date}</span>

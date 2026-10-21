@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TrendingUp, RefreshCw, ChevronRight } from 'lucide-react';
-import { mockQuotes } from '../data/mockNews';
+import { usePortalData } from '../context/PortalDataContext';
 import { MarketQuote } from '../types';
 
 interface MarketQuotesCanalRuralProps {
@@ -14,6 +14,7 @@ export const MarketQuotesCanalRural: React.FC<MarketQuotesCanalRuralProps> = ({
   maxHeight = 'max-h-[460px]',
   onSelectQuote,
 }) => {
+  const { quotes: mockQuotes } = usePortalData();
   const [activeTab, setActiveTab] = useState<'todos' | 'fisico' | 'futuro' | 'cambio'>('todos');
   const [selectedItem, setSelectedItem] = useState<MarketQuote | null>(null);
 

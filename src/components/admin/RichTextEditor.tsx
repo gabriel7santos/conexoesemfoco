@@ -24,22 +24,24 @@ import {
   Loader2,
   Minus,
   Sparkles,
+  FileText,
+  Clock,
 } from 'lucide-react';
 import { uploadMediaFile } from '../../lib/supabase';
 
 interface RichTextEditorProps {
   value: string;
-  onChange: (html: string, plainParagraphs: string[]) => void;
+  onChange: (html: string, plainParagraphs: string[], estimatedReadTime?: string) => void;
   placeholder?: string;
 }
 
 const TEXT_COLORS = [
-  { label: 'Padrão Escuro', color: '#0b1c30' },
+  { label: 'Preto Editorial', color: '#0b1c30' },
   { label: 'Verde Conexões', color: '#006d3f' },
-  { label: 'Azul Institucional', color: '#004E86' },
-  { label: 'Vermelho Urgente', color: '#dc2626' },
+  { label: 'Azul Executivo', color: '#004E86' },
+  { label: 'Vermelho Destaque', color: '#dc2626' },
   { label: 'Dourado Agro', color: '#b45309' },
-  { label: 'Cinza Editorial', color: '#475569' },
+  { label: 'Cinza Suave', color: '#475569' },
 ];
 
 const HIGHLIGHT_COLORS = [
@@ -53,7 +55,7 @@ const HIGHLIGHT_COLORS = [
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value,
   onChange,
-  placeholder = 'Comece a escrever sua matéria aqui... Use a barra acima (estilo Word) para formatar títulos, tamanhos de letra, negrito, citações e inserir fotos no meio do texto.',
+  placeholder = 'Comece a redigir sua matéria... Utilize a barra superior estilo Word para formatar títulos, aumentar ou diminuir letras (A+ / A-), aplicar negrito, citações e subir fotos no meio do texto.',
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,14 +67,25 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [imageWidthChoice, setImageWidthChoice] = useState<'100%' | '75%' | '50%'>('100%');
   const [showColorMenu, setShowColorMenu] = useState(false);
   const [showHighlightMenu, setShowHighlightMenu] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
   const savedRangeRef = useRef<Range | null>(null);
 
-  // Sincroniza valor externo quando muda de artigo
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
       editorRef.current.innerHTML = value || '<p><br></p>';
+      calculateMetrics(value || '');
     }
   }, [value]);
+
+  const calculateMetrics = (htmlStr: string) => {
+    const temp = document.createElement('div');
+    temp.innerHTML = htmlStr;
+    const text = (temp.textContent || '').trim();
+    const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+    setWordCount(words);
+    const minutes = Math.max(1, Math.ceil(words / 180));
+    return `${minutes} min de leitura`;
+  };
 
   const saveSelection = () => {
     const sel = window.getSelection();
@@ -92,7 +105,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const emitChange = () => {
     if (!editorRef.current) return;
     const html = editorRef.current.innerHTML;
-    // Extrai parágrafos limpos para fallback / resumo
     const temp = document.createElement('div');
     temp.innerHTML = html;
     const blocks = Array.from(temp.querySelectorAll('p, h1, h2, h3, h4, blockquote, li'))
@@ -106,7 +118,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             .map((s) => s.trim())
             .filter(Boolean);
 
-    onChange(html, plainParagraphs);
+    const readTime = calculateMetrics(html);
+    onChange(html, plainParagraphs, readTime);
   };
 
   const execCmd = (command: string, arg?: string) => {
@@ -125,7 +138,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) return;
 
-    // Usa fontSize 7 temporário e substitui pelo span com font-size exato em px
     document.execCommand('fontSize', false, '7');
     const fontElements = editorRef.current.querySelectorAll('font[size="7"]');
     fontElements.forEach((el) => {
@@ -180,7 +192,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const insertLink = () => {
     saveSelection();
-    const url = window.prompt('Digite ou cole o link (URL):', 'https://');
+    const url = window.prompt('Digite ou cole o endereço do link (URL):', 'https://');
     if (url && url !== 'https://') {
       restoreSelection();
       document.execCommand('createLink', false, url);
@@ -252,346 +264,347 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   return (
-    <div className="border border-gray-300 rounded-2xl bg-white shadow-sm overflow-hidden">
-      {/* BARRA DE FERRAMENTAS ESTILO WORD / PORTAL DE NOTÍCIAS */}
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 border-b border-gray-200 p-2.5 flex flex-wrap items-center gap-1.5 sticky top-0 z-20">
-        {/* DESFAZER / REFAZER */}
-        <button
-          type="button"
-          onClick={() => execCmd('undo')}
-          title="Desfazer (Ctrl+Z)"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-700 transition-all"
-        >
-          <Undo className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => execCmd('redo')}
-          title="Refazer (Ctrl+Y)"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-700 transition-all"
-        >
-          <Redo className="w-4 h-4" />
-        </button>
+    <div className="border border-slate-200 rounded-2xl bg-white shadow-sm overflow-hidden ring-1 ring-slate-900/5">
+      {/* BARRA DE FERRAMENTAS ESTILO WORD / REDAÇÃO JORNALÍSTICA */}
+      <div className="bg-slate-50/90 backdrop-blur-md border-b border-slate-200 p-2.5 flex flex-wrap items-center gap-1.5 sticky top-0 z-20">
+        {/* GRUPO: DESFAZER / REFAZER */}
+        <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5 shadow-2xs">
+          <button
+            type="button"
+            onClick={() => execCmd('undo')}
+            title="Desfazer (Ctrl+Z)"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-700 transition-colors"
+          >
+            <Undo className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('redo')}
+            title="Refazer (Ctrl+Y)"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-700 transition-colors"
+          >
+            <Redo className="w-4 h-4" />
+          </button>
+        </div>
 
-        <div className="h-5 w-px bg-gray-300 mx-1" />
+        {/* GRUPO: HIERARQUIA E TAMANHO DE FONTE ESTILO WORD */}
+        <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-2xs">
+          <select
+            aria-label="Estilo do bloco"
+            onChange={(e) => {
+              execCmd('formatBlock', e.target.value);
+              e.target.value = '';
+            }}
+            defaultValue=""
+            className="px-2 py-1 text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer"
+          >
+            <option value="" disabled>
+              Estilo de Parágrafo
+            </option>
+            <option value="P">Parágrafo Normal</option>
+            <option value="H1">Título Principal (H1)</option>
+            <option value="H2">Subtítulo de Seção (H2)</option>
+            <option value="H3">Intertítulo / Tópico (H3)</option>
+          </select>
 
-        {/* SELETOR DE ESTILO DE TÍTULO / PARÁGRAFO */}
-        <select
-          aria-label="Estilo do parágrafo ou título"
-          onChange={(e) => {
-            execCmd('formatBlock', e.target.value);
-            e.target.value = '';
-          }}
-          defaultValue=""
-          className="px-2.5 py-1.5 text-xs font-bold text-[#0b1c30] bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-[#006d3f]"
-        >
-          <option value="" disabled>
-            Formato do Bloco...
-          </option>
-          <option value="P">Texto Normal (Parágrafo)</option>
-          <option value="H1">Título Grande (H1)</option>
-          <option value="H2">Subtítulo de Seção (H2)</option>
-          <option value="H3">Tópico Destaque (H3)</option>
-        </select>
+          <div className="h-4 w-px bg-slate-200" />
 
-        {/* SELETOR DE TAMANHO DE FONTE + BOTÕES A+ e A- ESTILO WORD */}
-        <select
-          aria-label="Tamanho da letra"
-          onChange={(e) => {
-            if (e.target.value) applyFontSizePx(e.target.value);
-            e.target.value = '';
-          }}
-          defaultValue=""
-          className="px-2.5 py-1.5 text-xs font-bold text-[#0b1c30] bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-[#006d3f]"
-        >
-          <option value="" disabled>
-            Tamanho da Letra
-          </option>
-          <option value="14px">14px (Pequeno)</option>
-          <option value="16px">16px (Normal)</option>
-          <option value="18px">18px (Leitura Ideal)</option>
-          <option value="22px">22px (Subtítulo)</option>
-          <option value="26px">26px (Título Médio)</option>
-          <option value="32px">32px (Título Grande)</option>
-          <option value="40px">40px (Manchete Extra)</option>
-        </select>
+          <select
+            aria-label="Tamanho da fonte"
+            onChange={(e) => {
+              if (e.target.value) applyFontSizePx(e.target.value);
+              e.target.value = '';
+            }}
+            defaultValue=""
+            className="px-2 py-1 text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer"
+          >
+            <option value="" disabled>
+              Tamanho
+            </option>
+            <option value="14px">14 px</option>
+            <option value="16px">16 px</option>
+            <option value="18px">18 px (Ideal)</option>
+            <option value="22px">22 px</option>
+            <option value="26px">26 px</option>
+            <option value="32px">32 px</option>
+            <option value="40px">40 px</option>
+          </select>
 
-        <button
-          type="button"
-          onClick={() => stepFontSize(2)}
-          title="Aumentar tamanho da letra selecionada (Estilo Word A+)"
-          className="px-2 py-1 rounded-lg bg-white border border-gray-300 hover:bg-emerald-50 hover:border-[#006d3f] text-xs font-extrabold text-[#0b1c30] transition-all"
-        >
-          A+
-        </button>
-        <button
-          type="button"
-          onClick={() => stepFontSize(-2)}
-          title="Diminuir tamanho da letra selecionada (Estilo Word A-)"
-          className="px-2 py-1 rounded-lg bg-white border border-gray-300 hover:bg-emerald-50 hover:border-[#006d3f] text-[11px] font-bold text-gray-600 transition-all"
-        >
-          A-
-        </button>
+          <button
+            type="button"
+            onClick={() => stepFontSize(2)}
+            title="Aumentar tamanho da letra (A+)"
+            className="px-2 py-1 rounded-lg hover:bg-emerald-50 text-xs font-extrabold text-[#006d3f] transition-colors"
+          >
+            A+
+          </button>
+          <button
+            type="button"
+            onClick={() => stepFontSize(-2)}
+            title="Diminuir tamanho da letra (A-)"
+            className="px-2 py-1 rounded-lg hover:bg-slate-100 text-[11px] font-bold text-slate-600 transition-colors"
+          >
+            A-
+          </button>
+        </div>
 
-        <div className="h-5 w-px bg-gray-300 mx-1" />
+        {/* GRUPO: ESTILOS DE FONTE E CORES */}
+        <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5 shadow-2xs">
+          <button
+            type="button"
+            onClick={() => execCmd('bold')}
+            title="Negrito (Ctrl+B)"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-800 transition-colors"
+          >
+            <Bold className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('italic')}
+            title="Itálico (Ctrl+I)"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-800 transition-colors"
+          >
+            <Italic className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('underline')}
+            title="Sublinhado (Ctrl+U)"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-800 transition-colors"
+          >
+            <Underline className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('strikeThrough')}
+            title="Tachado"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-800 transition-colors"
+          >
+            <Strikethrough className="w-4 h-4" />
+          </button>
 
-        {/* NEGRITO, ITÁLICO, SUBLINHADO, TACHADO */}
-        <button
-          type="button"
-          onClick={() => execCmd('bold')}
-          title="Negrito (Ctrl+B)"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-800 font-bold transition-all"
-        >
-          <Bold className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => execCmd('italic')}
-          title="Itálico (Ctrl+I)"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-800 transition-all"
-        >
-          <Italic className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => execCmd('underline')}
-          title="Sublinhado (Ctrl+U)"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-800 transition-all"
-        >
-          <Underline className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => execCmd('strikeThrough')}
-          title="Riscado"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-800 transition-all"
-        >
-          <Strikethrough className="w-4 h-4" />
-        </button>
+          {/* COR DA LETRA */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                saveSelection();
+                setShowColorMenu((prev) => !prev);
+                setShowHighlightMenu(false);
+              }}
+              title="Cor do Texto"
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-800 transition-colors"
+            >
+              <Type className="w-4 h-4 text-[#006d3f]" />
+            </button>
+            {showColorMenu && (
+              <div className="absolute left-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl p-2 z-30 w-44 space-y-1">
+                <div className="text-[10px] font-bold uppercase text-slate-400 px-2 py-0.5">
+                  Cor da Letra
+                </div>
+                {TEXT_COLORS.map((c) => (
+                  <button
+                    key={c.color}
+                    type="button"
+                    onClick={() => {
+                      execCmd('foreColor', c.color);
+                      setShowColorMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-lg hover:bg-slate-50 text-left"
+                  >
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border border-slate-300 shrink-0"
+                      style={{ backgroundColor: c.color }}
+                    />
+                    <span className="font-semibold text-slate-700">{c.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {/* COR DO TEXTO */}
-        <div className="relative">
+          {/* MARCA-TEXTO */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                saveSelection();
+                setShowHighlightMenu((prev) => !prev);
+                setShowColorMenu(false);
+              }}
+              title="Marca-Texto (Grifar)"
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-800 transition-colors"
+            >
+              <Highlighter className="w-4 h-4 text-amber-500" />
+            </button>
+            {showHighlightMenu && (
+              <div className="absolute left-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl p-2 z-30 w-44 space-y-1">
+                <div className="text-[10px] font-bold uppercase text-slate-400 px-2 py-0.5">
+                  Grifo / Marca-Texto
+                </div>
+                {HIGHLIGHT_COLORS.map((c) => (
+                  <button
+                    key={c.label}
+                    type="button"
+                    onClick={() => {
+                      execCmd('hiliteColor', c.color);
+                      setShowHighlightMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-lg hover:bg-slate-50 text-left"
+                  >
+                    <span
+                      className="w-3.5 h-3.5 rounded border border-slate-300 shrink-0"
+                      style={{ backgroundColor: c.color }}
+                    />
+                    <span className="font-semibold text-slate-700">{c.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* GRUPO: ALINHAMENTOS & LISTAS */}
+        <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5 shadow-2xs">
+          <button
+            type="button"
+            onClick={() => execCmd('justifyLeft')}
+            title="Alinhar à Esquerda"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-700"
+          >
+            <AlignLeft className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('justifyCenter')}
+            title="Centralizar"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-700"
+          >
+            <AlignCenter className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('justifyRight')}
+            title="Alinhar à Direita"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-700"
+          >
+            <AlignRight className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('justifyFull')}
+            title="Justificar Texto"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-700"
+          >
+            <AlignJustify className="w-4 h-4" />
+          </button>
+          <div className="h-4 w-px bg-slate-200 mx-0.5" />
+          <button
+            type="button"
+            onClick={() => execCmd('insertUnorderedList')}
+            title="Lista com Marcadores"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-700"
+          >
+            <List className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('insertOrderedList')}
+            title="Lista Numerada"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-700"
+          >
+            <ListOrdered className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* GRUPO: INSERÇÕES RICAS (FOTO, CITAÇÃO, VÍDEO, LINK) */}
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => {
               saveSelection();
-              setShowColorMenu((prev) => !prev);
-              setShowHighlightMenu(false);
+              setShowImageModal(true);
             }}
-            title="Cor da Letra"
-            className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-800 flex items-center gap-0.5 transition-all"
+            className="px-3 py-1.5 rounded-xl bg-[#0E1B2B] hover:bg-[#162B42] text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
           >
-            <Type className="w-4 h-4 text-[#006d3f]" />
+            <ImageIcon className="w-3.5 h-3.5 text-[#7afbae]" />
+            <span>Inserir Foto</span>
           </button>
-          {showColorMenu && (
-            <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl p-2 z-30 w-44 space-y-1">
-              <div className="text-[10px] font-bold uppercase text-gray-400 px-2 py-0.5">
-                Cor da Letra
-              </div>
-              {TEXT_COLORS.map((c) => (
-                <button
-                  key={c.color}
-                  type="button"
-                  onClick={() => {
-                    execCmd('foreColor', c.color);
-                    setShowColorMenu(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-lg hover:bg-gray-50 text-left"
-                >
-                  <span
-                    className="w-4 h-4 rounded-full border border-gray-300 shrink-0"
-                    style={{ backgroundColor: c.color }}
-                  />
-                  <span className="font-semibold text-gray-700">{c.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* MARCA-TEXTO / GRIFO */}
-        <div className="relative">
           <button
             type="button"
-            onClick={() => {
-              saveSelection();
-              setShowHighlightMenu((prev) => !prev);
-              setShowColorMenu(false);
-            }}
-            title="Marca-Texto (Grifar)"
-            className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-800 flex items-center gap-0.5 transition-all"
+            onClick={insertJournalisticQuote}
+            title="Inserir Citação Destacada"
+            className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006d3f] text-xs font-bold flex items-center gap-1 border border-emerald-200/80 transition-colors cursor-pointer"
           >
-            <Highlighter className="w-4 h-4 text-amber-600" />
+            <Quote className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Citação</span>
           </button>
-          {showHighlightMenu && (
-            <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl p-2 z-30 w-44 space-y-1">
-              <div className="text-[10px] font-bold uppercase text-gray-400 px-2 py-0.5">
-                Cor do Marca-Texto
-              </div>
-              {HIGHLIGHT_COLORS.map((c) => (
-                <button
-                  key={c.label}
-                  type="button"
-                  onClick={() => {
-                    execCmd('hiliteColor', c.color);
-                    setShowHighlightMenu(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-lg hover:bg-gray-50 text-left"
-                >
-                  <span
-                    className="w-4 h-4 rounded border border-gray-300 shrink-0"
-                    style={{ backgroundColor: c.color }}
-                  />
-                  <span className="font-semibold text-gray-700">{c.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
+
+          <button
+            type="button"
+            onClick={insertYoutubeVideo}
+            title="Incorporar Vídeo do YouTube"
+            className="p-1.5 rounded-xl bg-white border border-slate-200 hover:bg-red-50 text-red-600 transition-colors"
+          >
+            <Video className="w-4 h-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={insertLink}
+            title="Inserir Link"
+            className="p-1.5 rounded-xl bg-white border border-slate-200 hover:bg-blue-50 text-blue-600 transition-colors"
+          >
+            <LinkIcon className="w-4 h-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => execCmd('insertHorizontalRule')}
+            title="Inserir Divisor Horizontal"
+            className="p-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
         </div>
 
-        <div className="h-5 w-px bg-gray-300 mx-1" />
-
-        {/* ALINHAMENTOS */}
-        <button
-          type="button"
-          onClick={() => execCmd('justifyLeft')}
-          title="Alinhar à Esquerda"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-700"
-        >
-          <AlignLeft className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => execCmd('justifyCenter')}
-          title="Centralizar"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-700"
-        >
-          <AlignCenter className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => execCmd('justifyRight')}
-          title="Alinhar à Direita"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-700"
-        >
-          <AlignRight className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => execCmd('justifyFull')}
-          title="Justificar Texto"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-700"
-        >
-          <AlignJustify className="w-4 h-4" />
-        </button>
-
-        <div className="h-5 w-px bg-gray-300 mx-1" />
-
-        {/* LISTAS E CITAÇÃO */}
-        <button
-          type="button"
-          onClick={() => execCmd('insertUnorderedList')}
-          title="Lista com Marcadores"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-700"
-        >
-          <List className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => execCmd('insertOrderedList')}
-          title="Lista Numerada"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-700"
-        >
-          <ListOrdered className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={insertJournalisticQuote}
-          title="Inserir Citação Jornalística com Barra Verde"
-          className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-[#006d3f] text-xs font-bold flex items-center gap-1 border border-emerald-200"
-        >
-          <Quote className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Citação</span>
-        </button>
-
-        <div className="h-5 w-px bg-gray-300 mx-1" />
-
-        {/* INSERIR IMAGEM NO MEIO DO TEXTO, VÍDEO E LINK */}
-        <button
-          type="button"
-          onClick={() => {
-            saveSelection();
-            setShowImageModal(true);
-          }}
-          className="px-2.5 py-1.5 rounded-lg bg-[#0E1B2B] hover:bg-[#1a2f4a] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
-        >
-          <ImageIcon className="w-3.5 h-3.5 text-[#7afbae]" />
-          <span>+ Foto no Texto</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={insertYoutubeVideo}
-          title="Inserir Vídeo do YouTube"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-red-600"
-        >
-          <Video className="w-4 h-4" />
-        </button>
-
-        <button
-          type="button"
-          onClick={insertLink}
-          title="Inserir Link"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-blue-600"
-        >
-          <LinkIcon className="w-4 h-4" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => execCmd('insertHorizontalRule')}
-          title="Inserir Linha Divisória"
-          className="p-2 rounded-lg hover:bg-white hover:shadow-xs text-gray-600"
-        >
-          <Minus className="w-4 h-4" />
-        </button>
-
-        {/* BOTÃO PREVIEW À DIREITA */}
+        {/* BOTÃO PREVIEW */}
         <button
           type="button"
           onClick={() => setPreviewMode((prev) => !prev)}
-          className={`ml-auto px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border transition-all ${
+          className={`ml-auto px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
             previewMode
               ? 'bg-[#006d3f] text-white border-[#006d3f]'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
           {previewMode ? (
             <>
               <Edit3 className="w-3.5 h-3.5" />
-              <span>Voltar ao Editor</span>
+              <span>Modo Edição</span>
             </>
           ) : (
             <>
               <Eye className="w-3.5 h-3.5" />
-              <span>Ver Como Fica</span>
+              <span>Simular Leitura</span>
             </>
           )}
         </button>
       </div>
 
-      {/* MODAL PARA INSERIR FOTO NO MEIO DA MATÉRIA */}
+      {/* PAINEL DE UPLOAD DE FOTO NO MEIO DA MATÉRIA */}
       {showImageModal && (
-        <div className="bg-[#f8fafc] border-b border-gray-200 p-4 space-y-3">
+        <div className="bg-slate-50 border-b border-slate-200 p-4 space-y-3 animate-fade-in">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#0b1c30] flex items-center gap-1.5">
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-[#006d3f]" />
-              Inserir Fotografia ou Imagem Dentro do Texto
+              Inserir Fotografia no Corpo da Matéria
             </h4>
             <button
               type="button"
               onClick={() => setShowImageModal(false)}
-              className="text-xs text-gray-500 hover:text-gray-800 font-bold"
+              className="text-xs text-slate-400 hover:text-slate-700 font-bold"
             >
               Fechar ✕
             </button>
@@ -599,16 +612,16 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-bold text-gray-600 mb-1">
-                Enviar do Computador (Supabase Storage) ou Colar Link:
+              <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                Arquivo do Computador ou URL da Imagem:
               </label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={imageUrlInput}
                   onChange={(e) => setImageUrlInput(e.target.value)}
-                  placeholder="https://... ou clique em Subir Foto"
-                  className="flex-1 px-3 py-2 text-xs rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#006d3f]"
+                  placeholder="https://... ou envie do computador"
+                  className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-[#006d3f]"
                 />
                 <input
                   ref={fileInputRef}
@@ -621,7 +634,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   type="button"
                   disabled={uploadingImage}
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-2 rounded-lg bg-[#006d3f] hover:bg-[#00522e] text-white text-xs font-bold flex items-center gap-1.5 shrink-0"
+                  className="px-3.5 py-2 rounded-xl bg-[#006d3f] hover:bg-[#00522e] text-white text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
                 >
                   {uploadingImage ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -634,34 +647,34 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-gray-600 mb-1">
-                Legenda / Crédito da Foto (Opcional):
+              <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                Legenda / Crédito Fotográfico (Opcional):
               </label>
               <input
                 type="text"
                 value={imageCaptionInput}
                 onChange={(e) => setImageCaptionInput(e.target.value)}
-                placeholder="Ex: Colheita de soja em Rio Verde (Foto: Divulgação)"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#006d3f]"
+                placeholder="Ex: Safra de grãos no Sudoeste Goiano (Foto: Divulgação)"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-[#006d3f]"
               />
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
             <div className="flex items-center gap-2 text-xs">
-              <span className="font-bold text-gray-600">Tamanho da Foto no Texto:</span>
+              <span className="font-bold text-slate-600">Proporção no Texto:</span>
               {(['100%', '75%', '50%'] as const).map((w) => (
                 <button
                   key={w}
                   type="button"
                   onClick={() => setImageWidthChoice(w)}
-                  className={`px-2.5 py-1 rounded-md font-bold border ${
+                  className={`px-2.5 py-1 rounded-lg font-bold border transition-colors ${
                     imageWidthChoice === w
                       ? 'bg-[#0E1B2B] text-white border-[#0E1B2B]'
-                      : 'bg-white text-gray-600 border-gray-300'
+                      : 'bg-white text-slate-600 border-slate-300'
                   }`}
                 >
-                  {w === '100%' ? 'Largura Total (100%)' : w === '75%' ? 'Média (75%)' : 'Pequena (50%)'}
+                  {w === '100%' ? 'Largura Total (100%)' : w === '75%' ? 'Média (75%)' : 'Compacta (50%)'}
                 </button>
               ))}
             </div>
@@ -670,24 +683,26 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               type="button"
               onClick={confirmInsertImageInText}
               disabled={!imageUrlInput.trim()}
-              className="px-4 py-2 rounded-lg bg-[#23B26D] hover:bg-[#1fa162] disabled:opacity-40 text-white text-xs font-extrabold uppercase tracking-wider shadow-sm"
+              className="px-4 py-2 rounded-xl bg-[#23B26D] hover:bg-[#1fa162] disabled:opacity-40 text-white text-xs font-extrabold uppercase tracking-wider shadow-xs cursor-pointer"
             >
-              Inserir Foto no Texto Agora
+              Confirmar e Inserir Foto
             </button>
           </div>
         </div>
       )}
 
-      {/* ÁREA DE EDIÇÃO WYSIWYG OU PREVIEW */}
+      {/* FOLHA DE REDAÇÃO (ESTILO DOCUMENTO EDITORIAL) */}
       {previewMode ? (
-        <div className="p-6 sm:p-8 min-h-[380px] bg-[#fcfdff]">
-          <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#006d3f] mb-4 pb-2 border-b border-gray-100">
-            Pré-visualização Real da Matéria no Portal
+        <div className="p-6 sm:p-10 min-h-[420px] bg-slate-50/50">
+          <div className="max-w-3xl mx-auto bg-white p-8 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#006d3f] mb-4 pb-2 border-b border-slate-100">
+              Simulação Fiel da Página de Leitura
+            </div>
+            <div
+              className="article-rich-content prose prose-lg max-w-none text-[#1E293B] leading-relaxed space-y-4"
+              dangerouslySetInnerHTML={{ __html: value }}
+            />
           </div>
-          <div
-            className="article-rich-content prose prose-lg max-w-none text-[#1E293B] leading-relaxed space-y-4"
-            dangerouslySetInnerHTML={{ __html: value }}
-          />
         </div>
       ) : (
         <div
@@ -698,9 +713,26 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           onKeyUp={saveSelection}
           onMouseUp={saveSelection}
           data-placeholder={placeholder}
-          className="article-rich-content p-6 sm:p-8 min-h-[380px] max-h-[680px] overflow-y-auto focus:outline-none text-[#1E293B] text-base sm:text-lg leading-relaxed"
+          className="article-rich-content p-6 sm:p-10 min-h-[420px] max-h-[680px] overflow-y-auto focus:outline-none text-[#1E293B] text-base sm:text-lg leading-relaxed bg-white"
         />
       )}
+
+      {/* RODAPÉ DE CONTAGEM DE PALAVRAS E TEMPO ESTIMADO */}
+      <div className="bg-slate-50 border-t border-slate-200 px-5 py-2.5 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5 text-slate-400" />
+            <strong>{wordCount}</strong> palavras
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-[#006d3f]" />
+            Tempo estimado: <strong>{Math.max(1, Math.ceil(wordCount / 180))} min de leitura</strong>
+          </span>
+        </div>
+        <span className="text-slate-400 hidden sm:inline">
+          Dica: Selecione qualquer trecho e clique em <strong>A+</strong> ou <strong>H2</strong> para destacar títulos
+        </span>
+      </div>
     </div>
   );
 };

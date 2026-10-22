@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Palestra e Workshop de Comunicação Resolutiva - BioTech Terra Forte</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap');
+
+  @page {
+    size: A4;
+    margin: 15mm 14mm 15mm 14mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #1f2937;
+    background-color: #ffffff;
+    line-height: 1.55;
+    font-size: 13.5px;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: 'Montserrat', sans-serif;
+    color: #14532d;
+    margin-top: 0;
+    font-weight: 700;
+  }
+
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Capa Elegante */
+  .cover {
+    min-height: 96vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 3px solid #166534;
+    border-radius: 12px;
+    padding: 40px 35px;
+    background: linear-gradient(145deg, #f0fdf4 0%, #ffffff 50%, #f7fee7 100%);
+    position: relative;
+    box-shadow: inset 0 0 0 2px #bbf7d0;
+  }
+
+  .badge-top {
+    display: inline-block;
+    background-color: #166534;
+    color: #ffffff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .cover-title-group {
+    margin-top: 40px;
+  }
+
+  .cover-title {
+    font-size: 32px;
+    line-height: 1.25;
+    color: #14532d;
+    margin-bottom: 15px;
+    font-weight: 800;
+  }
+
+  .cover-subtitle {
+    font-size: 17px;
+    color: #374151;
+    font-weight: 500;
+    line-height: 1.4;
+    border-left: 4px solid #15803d;
+    padding-left: 14px;
+  }
+
+  .cover-tagline {
+    margin-top: 25px;
+    background-color: #dcfce7;
+    border: 1px dashed #16a34a;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-style: italic;
+    color: #166534;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .cover-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 50px;
+    border-top: 2px solid #bbf7d0;
+    padding-top: 25px;
+  }
+
+  .meta-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+
+  .meta-label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .meta-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  /* Cabeçalho das Páginas Internas */
+  .doc-header {
+    border-bottom: 2px solid #15803d;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .doc-header .brand {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: #166534;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .doc-header .doc-type {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: 20px;
+    border-bottom: 2px solid #dcfce7;
+    padding-bottom: 6px;
+    margin-top: 20px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h3 {
+    font-size: 16px;
+    color: #166534;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: justify;
+  }
+
+  /* Destaques e Caixas de Alerta */
+  .callout {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 14px 0;
+    border-left: 5px solid;
+    font-size: 13px;
+  }
+
+  .callout-agro {
+    background-color: #f0fdf4;
+    border-color: #16a34a;
+    color: #14532d;
+  }
+
+  .callout-alert {
+    background-color: #fef2f2;
+    border-color: #dc2626;
+    color: #991b1b;
+  }
+
+  .callout-gold {
+    background-color: #fffbeb;
+    border-color: #d97706;
+    color: #92400e;
+  }
+
+  .callout-blue {
+    background-color: #eff6ff;
+    border-color: #2563eb;
+    color: #1e40af;
+  }
+
+  .callout-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Tabelas */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 12.5px;
+  }
+
+  th {
+    background-color: #166534;
+    color: #ffffff;
+    text-align: left;
+    padding: 10px 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+
+  /* Blocos do Roteiro */
+  .block-container {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+
+  .block-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #15803d;
+  }
+
+  .block-badge {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+
+  .speech-box {
+    background: #f8fafc;
+    border-left: 4px solid #0284c7;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-style: italic;
+    color: #334155;
+  }
+
+  .speech-label {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 11px;
+    color: #0284c7;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  /* Comparativo Do / Don't */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 12px 0;
+  }
+
+  .card-prohibited {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .card-recommended {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .card-title-red {
+    color: #b91c1c;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .card-title-green {
+    color: #15803d;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  ul {
+    margin-top: 4px;
+    margin-bottom: 8px;
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* Cartão de Bolso Visual */
+  .pocket-card-wrapper {
+    border: 2px dashed #16a34a;
+    border-radius: 12px;
+    padding: 16px;
+    background: #fdfdfd;
+    margin-top: 15px;
+  }
+
+  .pocket-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .pocket-side {
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+    padding: 14px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  }
+
+  .pocket-header {
+    background: #166534;
+    color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .afe-step {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #cbd5e1;
+  }
+
+  .afe-letter {
+    display: inline-block;
+    background: #15803d;
+    color: #ffffff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 22px;
+    font-weight: 700;
+    font-size: 12px;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<div class="cover">
+  <div>
+    <span class="badge-top">Programa de Desenvolvimento e Alinhamento de Equipe</span>
+    <div class="cover-title-group">
+      <div class="cover-title">Comunicação Resolutiva & Excelência no Atendimento ao Sócio-Produtor</div>
+      <div class="cover-subtitle">
+        Manual do Facilitador & Roteiro Prático de Workshop Integrado<br>
+        <strong>Da Operação de Fábrica à Gestão: Falando com uma Só Voz</strong>
+      </div>
+      <div class="cover-tagline">
+        "Aqui na BioTech Terra Forte, não vendemos problemas e nem desculpas. Nós vendemos soluções."
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-meta-grid">
+    <div class="meta-card">
+      <div class="meta-label">Organização / Startup</div>
+      <div class="meta-value">BioTech Terra Forte | Grupo Terra Forte</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Facilitadora Responsável</div>
+      <div class="meta-value">Daris (Darcy)</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Público-Alvo</div>
+      <div class="meta-value">12 Colaboradores (Chão de Fábrica, Logística, Recepção e Gestão)</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Formato & Carga Horária</div>
+      <div class="meta-value">Roda de Conversa Prática & Dinâmicas (1h45 a 2h00)</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PÁGINA 1: CONTEXTO & DIAGNÓSTICO -->
+<div class="doc-header">
+  <span class="brand">BioTech Terra Forte | Manual de Facilitação</span>
+  <span class="doc-type">Planejamento Estratégico</span>
+</div>
+
+<h2>1. Contexto & Diagnóstico da Operação</h2>
+
+<p>
+A <strong>BioTech Terra Forte</strong> atua em um ecossistema de alto valor agregado no agronegócio, funcionando integrada à central de compras do <strong>Grupo Terra Forte</strong>. Cada cooperado/associado realiza seu planejamento de compras esperando rigor absoluto nos prazos acordados.
+</p>
+
+<div class="callout callout-gold avoid-break">
+  <div class="callout-title">⚠️ O Ponto Crítico: O Cliente é um "Sócio-Produtor Rural"</div>
+  <p style="margin-bottom: 0;">
+    O cliente que entra em contato ou chega à fábrica <strong>não é um consumidor comum; ele é cotista/sócio do grupo</strong>. 
+    Para o produtor rural, atrasos de insumos biológicos ou defensivos não significam mero aborrecimento burocrático: <strong>significam risco direto de perda de safra, perda de janela de plantio e prejuízo financeiro severo</strong>. Por ser sócio, ele possui fácil acesso e o contato pessoal de diretores e gerentes, cobrando resolutividade de qualquer pessoa com o uniforme da empresa.
+  </p>
+</div>
+
+<h3>Desafios e Particularidades do Grupo (12 Participantes)</h3>
+<ul>
+  <li><strong>Alta Heterogeneidade de Escolaridade:</strong> O grupo varia do ensino primário completo (operadores do galpão) a pós-graduações e mestrados (gestores). <em>Diretriz de condução: linguagem 100% prática, acessível, visual e sem jargões corporativos em inglês.</em></li>
+  <li><strong>Cultura de Coesão:</strong> O lema da equipe é que <em>"todos falem e todos sejam ouvidos"</em>. O ambiente já é receptivo, mas precisa de um método padronizado para evitar o sentimento de desamparo na ponta.</li>
+  <li><strong>Nível de Autonomia do Chão de Fábrica:</strong> O operador não altera rotas nem altera prazos no sistema. O papel dele com o cliente irritado é: <strong>Acolher a emoção, compreender a demanda e conduzir imediatamente ao canal responsável (Logística/Gestão)</strong>.</li>
+  <li><strong>Meta Principal:</strong> Eliminar de forma definitiva o ruído de desculpas internas (ex: <em>"o escritório errou"</em>, <em>"a logística atrasou"</em>) e transformar todo colaborador em um elo de confiança e solução.</li>
+</ul>
+
+<div class="callout callout-agro avoid-break">
+  <div class="callout-title">🚜 Analogia Central para a Palestra: O Trator da Safra</div>
+  <p style="margin-bottom: 0;">
+    "Uma colheita de sucesso depende tanto do motor de alta potência do trator (Gestão/Diretoria) quanto do parafuso de fixação da esteira (Chão de Fábrica). Se um parafuso afrouxa, o trator para no meio do barro e a lavoura inteira sofre. Na BioTech Terra Forte, cada um de nós é peça fundamental para que o produtor colha com sucesso."
+  </p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PÁGINA 2: CRONOGRAMA & ROTEIRO BLOCO 1 E 2 -->
+<div class="doc-header">
+  <span class="brand">BioTech Terra Forte | Manual de Facilitação</span>
+  <span class="doc-type">Linha do Tempo do Encontro</span>
+</div>
+
+<h2>2. Cronograma Executivo da Sessão (1h45 a 2h00)</h2>
+
+<table class="avoid-break">
+  <thead>
+    <tr>
+      <th style="width: 15%;">Horário / Duração</th>
+      <th style="width: 25%;">Momento / Bloco</th>
+      <th style="width: 35%;">Objetivo Prático</th>
+      <th style="width: 25%;">Dinâmica / Formato</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>00:00 - 00:20</strong> (20 min)</td>
+      <td><strong>Bloco 1: Abertura & Acolhimento</strong></td>
+      <td>Quebrar barreiras hierárquicas e valorizar a importância vital de cada função.</td>
+      <td>Roda Aberta: <em>"O que está na cabeça do produtor?"</em></td>
+    </tr>
+    <tr>
+      <td><strong>00:20 - 00:50</strong> (30 min)</td>
+      <td><strong>Bloco 2: Ruídos Internos & Fim do "Jogo da Cerca"</strong></td>
+      <td>Compreender que o cliente enxerga a empresa como um único corpo indivisível.</td>
+      <td>Dinâmica: <em>"O Telefone Sem Fio da Operação"</em></td>
+    </tr>
+    <tr>
+      <td><strong>00:50 - 01:30</strong> (40 min)</td>
+      <td><strong>Bloco 3: A Metodologia A.F.E. na Prática</strong></td>
+      <td>Treinar os 3 passos de atendimento ao cliente nervoso: Acolher, Filtrar, Encaminhar.</td>
+      <td>Simulação guiada (Roleplay em dupla: Gestor x Operador)</td>
+    </tr>
+    <tr>
+      <td><strong>01:30 - 01:50</strong> (20 min)</td>
+      <td><strong>Bloco 4: O Pacto de Equipe & Fluxos</strong></td>
+      <td>Alinhar o que a fábrica precisa da gestão e o que a gestão precisa da fábrica.</td>
+      <td>Construção de Acordo Mútuo & Entrega do Cartão de Bolso</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. Roteiro de Condução da Facilitadora (Daris)</h2>
+
+<div class="block-container avoid-break">
+  <div class="block-header">
+    <span class="block-title">Bloco 1: Abertura & Nivelamento (20 min)</span>
+    <span class="block-badge">Empatia com o Sócio-Produtor</span>
+  </div>
+
+  <p><strong>Ação da Facilitadora:</strong> Dispor as 12 cadeiras em círculo contínuo (sem mesas separando, sem fileiras). Misturar gestores e operadores lado a lado.</p>
+
+  <div class="speech-box">
+    <span class="speech-label">Fala Sugerida para Daris:</span>
+    "Bom dia a todos! Hoje não estamos aqui para uma palestra engravatada ou para ninguém dar lição de moral em ninguém. Estamos aqui em família, porque a BioTech Terra Forte é uma equipe coesa onde todo mundo trabalha duro pelo mesmo objetivo: o resultado no campo. Eu quero começar fazendo uma pergunta aberta para qualquer um responder: <strong>Quando o produtor rural chega aqui no portão ou liga na recepção soltando fogo pelas ventas porque a mercadoria dele atrasou... o que vocês acham que está passando na cabeça e no coração dele lá na fazenda?</strong>"
+  </div>
+
+  <p><strong>Pontos para Daris provocar e costurar:</strong></p>
+  <ul>
+    <li>Ouvir 2 ou 3 respostas do chão de fábrica e da recepção.</li>
+    <li>Reforçar: <em>"Ele não está bravo com a cara do João ou da Maria. Ele está apavorado porque o clima não espera, a chuva está vindo, a lagarta não perdoa e o dinheiro dele está em jogo."</em></li>
+    <li><strong>Conclusão do Bloco:</strong> O produtor irritado não é um inimigo atacando a gente; é um parceiro desesperado pedindo socorro.</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PÁGINA 3: BLOCO 2 E 3 -->
+<div class="doc-header">
+  <span class="brand">BioTech Terra Forte | Manual de Facilitação</span>
+  <span class="doc-type">Roteiro Detalhado & Dinâmicas</span>
+</div>
+
+<div class="block-container avoid-break">
+  <div class="block-header">
+    <span class="block-title">Bloco 2: Ruídos Internos & Ninguém Joga a Culpa na Cerca (30 min)</span>
+    <span class="block-badge">Consciência de Equipe Única</span>
+  </div>
+
+  <p><strong>Dinâmica Rápida: O Telefone Sem Fio da Operação (10 min)</strong></p>
+  <ul>
+    <li>Daris chama um gestor no ouvido e passa uma mensagem com 4 dados operacionais: <em>"Carga de biodefensivo da Fazenda Primavera retida por laudo; previsão de liberação às 16h; falar com Robson para priorizar expedição."</em></li>
+    <li>A mensagem é passada de boca em ouvido por 4 pessoas até chegar a um operador de fábrica. O último fala em voz alta.</li>
+    <li><em>Debate:</em> O que sobrou da mensagem? Como um detalhe esquecido vira uma bomba na frente do cliente?</li>
+  </ul>
+
+  <div class="speech-box">
+    <span class="speech-label">Fala Sugerida para Daris:</span>
+    "Vocês viram como uma informação truncada vira confusão? Agora imaginem o produtor chegando furioso no galpão e alguém do chão de fábrica dizendo: <em>'Ah, Seu Carlos, isso aí é culpa do pessoal do escritório que não faturou!'</em> ou <em>'A logística aqui é sempre enrolada'</em>. O que o produtor escuta? Ele não pensa que a culpa é do escritório; <strong>ele pensa que a BioTech Terra Forte inteira é uma bagunça e que ele não pode confiar na gente!</strong>"
+  </div>
+
+  <div class="callout callout-alert">
+    <div class="callout-title">🚫 A Regra de Ouro da Terra Forte:</div>
+    <strong>Nunca exponha um colega ou outro setor para justificar uma falha ao cliente.</strong> Para o produtor, o operador de empilhadeira, a recepcionista e o diretor executivo são a mesmíssima coisa: a empresa dele.
+  </div>
+</div>
+
+<div class="block-container avoid-break">
+  <div class="block-header">
+    <span class="block-title">Bloco 3: O Método A.F.E. para Desarmar o Conflito (40 min)</span>
+    <span class="block-badge">Técnica Prática de Comunicação</span>
+  </div>
+
+  <p>Daris apresenta a ferramenta central de atendimento com clareza visual e exemplos reais do agronegócio:</p>
+
+  <div style="margin: 15px 0;">
+    <div class="afe-step">
+      <span class="afe-letter">A</span> <strong>ACOLHER (Descompressão Emocional):</strong>
+      <p style="margin-left: 28px; margin-bottom: 2px;">
+        Não cruze os braços. Não interrompa. Olhe nos olhos e balance a cabeça demonstrando atenção. 
+        Deixe o produtor falar tudo o que tem para falar nos primeiros 40 segundos sem rebater. A raiva é como vapor de panela de pressão: se você tentar tampar, ela explode.
+      </p>
+    </div>
+
+    <div class="afe-step">
+      <span class="afe-letter">F</span> <strong>FILTRAR & VALIDAR (Separar o Fato da Emoção):</strong>
+      <p style="margin-left: 28px; margin-bottom: 2px;">
+        Valide o sentimento dele com empatia sincera: <em>"Seu Antônio, compreendo perfeitamente a sua preocupação. O senhor tem toda razão de querer seu produto logo com o plantio rodando."</em> Em seguida, filtre o fato: anote o nome dele, o produto e a data combinada.
+      </p>
+    </div>
+
+    <div class="afe-step" style="border-bottom: none;">
+      <span class="afe-letter">E</span> <strong>ENCAMINHAR COM SOLUÇÃO (A Ponte Segura):</strong>
+      <p style="margin-left: 28px; margin-bottom: 2px;">
+        Venda atitude e resolução: <em>"Eu trabalho na operação e não consigo alterar o caminhão de rota aqui pelo galpão, mas o meu papel agora é levar o senhor e o seu caso imediatamente para o responsável da Logística resolver. Vamos até a sala dele comigo agora?"</em>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PÁGINA 4: SIMULAÇÃO PRÁTICA & O QUE DIZER -->
+<div class="doc-header">
+  <span class="brand">BioTech Terra Forte | Manual de Facilitação</span>
+  <span class="doc-type">Treinamento Prático & Simulações</span>
+</div>
+
+<h2>4. Dinâmica de Simulação Guiada (Roleplay Descontraído)</h2>
+
+<p>
+Para fixar o aprendizado, Daris convida **duas duplas** para uma rápida encenação de 3 minutos, com intervenções acolhedoras e sem julgamentos:
+</p>
+
+<div class="callout callout-blue avoid-break">
+  <div class="callout-title">🎭 Cenário da Simulação: O Produtor Estressado no Portão</div>
+  <p>
+    <strong>Papel 1 (Produtor Sócio - interpretado por um Gestor):</strong> Entra afobado, dizendo que as sementes/biológicos deveriam ter chegado ontem na Fazenda Santa Luzia, que os maquinários estão parados consumindo diária e que ele quer falar com o diretor agora.<br>
+    <strong>Papel 2 (Colaborador do Chão de Fábrica):</strong> Deve aplicar os 3 passos do Método A.F.E.: (1) Ouvir sem rebater; (2) Validar a dor; (3) Encaminhar para a Logística com presteza.
+  </p>
+</div>
+
+<p><strong>Roteiro de Feedback de Daris após a simulação:</strong></p>
+<ul>
+  <li>Elogiar calorosamente a atitude e coragem de quem participou.</li>
+  <li>Perguntar ao "produtor": <em>"Como você se sentiu quando ele te ouviu sem te cortar?"</em> (Ele vai dizer: 'Mais calmo').</li>
+  <li>Ajustar pequenos vícios de linguagem se houver (como dizer 'calma', que irrita ainda mais).</li>
+</ul>
+
+<h3>Guia Prático de Postura e Vocabulário</h3>
+
+<div class="grid-2 avoid-break">
+  <div class="card-prohibited">
+    <div class="card-title-red">❌ O Que NUNCA Dizer ao Sócio:</div>
+    <ul>
+      <li><em>"O senhor precisa se acalmar."</em> (Aumenta a raiva na hora).</li>
+      <li><em>"Isso não é comigo, é com a Logística."</em> (Sensação de descaso).</li>
+      <li><em>"O pessoal do escritório esqueceu de soltar o pedido."</em> (Queima a empresa).</li>
+      <li><em>"O caminhão quebrou, infelizmente não tem o que fazer hoje."</em> (Vende problema puro).</li>
+      <li><em>"Pode deixar que eu prometo que chega daqui a 1 hora."</em> (Promessa falsa sem autoridade).</li>
+    </ul>
+  </div>
+
+  <div class="card-recommended">
+    <div class="card-title-green">✅ O Que SEMPRE Dizer (Soluções):</div>
+    <ul>
+      <li><em>"Compreendo perfeitamente sua urgência, Seu [Nome]."</em></li>
+      <li><em>"O senhor tem toda razão de cobrar, sei que a janela de aplicação é apertada."</em></li>
+      <li><em>"O senhor está em boas mãos. Eu vou conduzir o seu pedido diretamente para a Logística agora."</em></li>
+      <li><em>"Vou acompanhar de perto até termos a previsão exata de entrega para o senhor."</em></li>
+      <li><em>"Me acompanhe até a recepção enquanto eu chamo o responsável para falar com o senhor."</em></li>
+    </ul>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PÁGINA 5: PACTO INTERNO E ANEXOS -->
+<div class="doc-header">
+  <span class="brand">BioTech Terra Forte | Manual de Facilitação</span>
+  <span class="doc-type">Acordo Coletivo & Materiais de Apoio</span>
+</div>
+
+<h2>5. Bloco 4: O Pacto Interno da Equipe (20 min)</h2>
+
+<p>
+Para fechar o encontro com chave de ouro, Daris faz duas perguntas diretas para selar o compromisso entre os 12 participantes:
+</p>
+
+<div class="grid-2 avoid-break">
+  <div class="callout callout-agro" style="margin: 0;">
+    <div class="callout-title">🏭 O que o Chão de Fábrica pede à Gestão:</div>
+    <ul style="font-size: 12.5px; padding-left: 16px;">
+      <li>Avisar com antecedência quando uma carga vai atrasar, para ninguém ser pego de surpresa.</li>
+      <li>Explicar as prioridades do dia de forma clara e direta no início de cada turno.</li>
+      <li>Apoio rápido quando o produtor chegar exaltado no galpão.</li>
+    </ul>
+  </div>
+
+  <div class="callout callout-blue" style="margin: 0;">
+    <div class="callout-title">👔 O que a Gestão pede ao Chão de Fábrica:</div>
+    <ul style="font-size: 12.5px; padding-left: 16px;">
+      <li>Nunca deixar o produtor desamparado ou sem resposta.</li>
+      <li>Avisar imediatamente qualquer divergência vista na carga ou etiqueta.</li>
+      <li>Guardar a regra sagrada: falar com uma só voz perante o produtor rural.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 style="margin-top: 25px;">6. Material de Apoio: Guia de Bolso do Colaborador</h2>
+<p style="font-size: 12.5px; color: #475569;">
+Abaixo está o modelo do <strong>Cartão de Bolso Plastificado (Tamanho Crachá/Carteira)</strong> sugerido para ser entregue a cada um dos 12 colaboradores no final da sessão:
+</p>
+
+<div class="pocket-card-wrapper avoid-break">
+  <div class="pocket-card-grid">
+    <!-- FRENTE -->
+    <div class="pocket-side">
+      <div class="pocket-header">FRENTE: MÉTODO A.F.E. (NO ATENDIMENTO)</div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;"><strong>1. ACOLHER:</strong> Olhe nos olhos, ouça sem interromper e não leve para o lado pessoal.</p>
+      <p style="font-size: 11.5px; margin-bottom: 6px;"><strong>2. FILTRAR:</strong> Diga: <em>"Compreendo o senhor, sua preocupação com a lavoura é totalmente justa."</em> Pegue o nome e o pedido.</p>
+      <p style="font-size: 11.5px; margin-bottom: 6px;"><strong>3. ENCAMINHAR:</strong> Diga: <em>"Vou te levar agora ao responsável para encontrarmos a melhor solução pro senhor."</em></p>
+      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 5px; font-size: 10.5px; color: #991b1b; text-align: center; font-weight: 700;">
+        NUNCA DIGA: "Isso não é comigo" ou "A culpa foi do outro setor".
+      </div>
+    </div>
+
+    <!-- VERSO -->
+    <div class="pocket-side">
+      <div class="pocket-header">VERSO: QUEM ACIONAR IMEDIATAMENTE?</div>
+      <table style="margin: 0; font-size: 11px;">
+        <tr>
+          <td><strong>Dúvida de Rota / Entrega</strong></td>
+          <td>Logística / Expedição</td>
+        </tr>
+        <tr>
+          <td><strong>Problema de Faturamento</strong></td>
+          <td>Administrativo / Financeiro</td>
+        </tr>
+        <tr>
+          <td><strong>Produtor Muito Exaltado</strong></td>
+          <td>Gerente Operacional / Diretoria</td>
+        </tr>
+        <tr>
+          <td><strong>Dúvida Técnica de Produto</strong></td>
+          <td>Responsável Técnico BioTech</td>
+        </tr>
+      </table>
+      <div style="margin-top: 8px; font-size: 10px; color: #166534; text-align: center; font-weight: 700;">
+        BioTech Terra Forte — Solução, Confiança e Parceria.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callout callout-gold avoid-break" style="margin-top: 20px;">
+  <div class="callout-title">💡 Dica de Ouro para a Facilitadora (Daris):</div>
+  <p style="margin-bottom: 0;">
+    Como o público é heterogêneo (do primário à pós-graduação), evite falar de conceitos teóricos longos. Chame os operadores pelo nome, valorize a sabedoria prática deles no manuseio diário da fábrica e garanta que os gestores tenham uma postura de escuta e acolhimento durante toda a dinâmica. O sucesso dessa palestra estará no sentimento de pertencimento de cada colaborador!
+  </p>
+</div>
+
+</body>
+</html>

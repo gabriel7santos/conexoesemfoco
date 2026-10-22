@@ -43,15 +43,12 @@ export const SpecialHubsSection: React.FC = () => {
             <p className="text-xs text-gray-600 leading-relaxed mb-4">
               Espaço dedicado ao fomento de negócios em Goiás. Cases de sucesso de indústrias, franquias, cooperativas e oportunidades de parcerias estratégicas.
             </p>
-            <div className="bg-[#f8f9ff] rounded-lg p-3 text-xs border border-gray-100 mb-4">
-              <strong className="text-[#0b1c30] block mb-1">Destaque Recente:</strong>
-              <p className="text-gray-600 line-clamp-2">
-                "
-                {latestEmpresarial?.title ||
-                  'Gestão Estratégica: O novo perfil das empresas familiares e sucessão no agro de Goiás'}
-                "
-              </p>
-            </div>
+            {latestEmpresarial && (
+              <div className="bg-[#f8f9ff] rounded-lg p-3 text-xs border border-gray-100 mb-4">
+                <strong className="text-[#0b1c30] block mb-1">Destaque Recente:</strong>
+                <p className="text-gray-600 line-clamp-2">"{latestEmpresarial.title}"</p>
+              </div>
+            )}
           </div>
           <Link
             to="/hub/empresarial"
@@ -79,15 +76,12 @@ export const SpecialHubsSection: React.FC = () => {
             <p className="text-xs text-gray-600 leading-relaxed mb-4">
               Artigos de análise e orientações jurídicas de advogados especialistas em Direito Agrário, Tributário, Trabalhista e Compliance corporativo.
             </p>
-            <div className="bg-[#f8f9ff] rounded-lg p-3 text-xs border border-gray-100 mb-4">
-              <strong className="text-[#0b1c30] block mb-1">Artigo em Foco:</strong>
-              <p className="text-gray-600 line-clamp-2">
-                "
-                {latestLei?.title ||
-                  'Segurança Jurídica: Como blindar contratos agrários e mitigar riscos na safra'}
-                "
-              </p>
-            </div>
+            {latestLei && (
+              <div className="bg-[#f8f9ff] rounded-lg p-3 text-xs border border-gray-100 mb-4">
+                <strong className="text-[#0b1c30] block mb-1">Artigo em Foco:</strong>
+                <p className="text-gray-600 line-clamp-2">"{latestLei.title}"</p>
+              </div>
+            )}
           </div>
           <Link
             to="/hub/lei"
@@ -115,18 +109,20 @@ export const SpecialHubsSection: React.FC = () => {
             <p className="text-xs text-gray-600 leading-relaxed mb-4">
               Calendário completo das grandes feiras do agronegócio, congressos técnicos, rodadas de negócios e eventos culturais da cidade e do estado.
             </p>
-            <div className="space-y-2 mb-4">
-              {events.slice(0, 2).map((ev) => (
-                <div
-                  key={ev.id}
-                  className="flex items-center gap-2 text-xs text-gray-700 bg-[#f8f9ff] p-2 rounded-lg border border-gray-100"
-                >
-                  <Calendar className="w-4 h-4 text-[#006d3f] shrink-0" />
-                  <span className="font-bold truncate">{ev.title}</span>
-                  <span className="text-[10px] text-gray-400 shrink-0 ml-auto">{ev.date}</span>
-                </div>
-              ))}
-            </div>
+            {events.length > 0 && (
+              <div className="space-y-2 mb-4">
+                {events.slice(0, 2).map((ev) => (
+                  <div
+                    key={ev.id}
+                    className="flex items-center gap-2 text-xs text-gray-700 bg-[#f8f9ff] p-2 rounded-lg border border-gray-100"
+                  >
+                    <Calendar className="w-4 h-4 text-[#006d3f] shrink-0" />
+                    <span className="font-bold truncate">{ev.title}</span>
+                    <span className="text-[10px] text-gray-400 shrink-0 ml-auto">{ev.date}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <Link
             to="/agenda-eventos"

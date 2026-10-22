@@ -6,7 +6,7 @@ import { usePortalData } from '../context/PortalDataContext';
 export const HubPage: React.FC = () => {
   const { type } = useParams<{ type: string }>();
   const navigate = useNavigate();
-  const { getArticlesByHub, articles: allArticles } = usePortalData();
+  const { getArticlesByHub } = usePortalData();
 
   const isEmpresarial = type === 'empresarial';
   const hubTitle = isEmpresarial ? 'Conexão Empresarial' : 'Conexão com a Lei';
@@ -16,13 +16,7 @@ export const HubPage: React.FC = () => {
   const HubIcon = isEmpresarial ? Building2 : Scale;
   const hubColor = isEmpresarial ? '#0E1B2B' : '#006d3f';
 
-  const hubArticles = getArticlesByHub(isEmpresarial ? 'empresarial' : 'lei');
-  const displayArticles =
-    hubArticles.length > 0
-      ? hubArticles
-      : allArticles.filter((a) =>
-          isEmpresarial ? a.category === 'Economia' : a.category === 'Política'
-        );
+  const displayArticles = getArticlesByHub(isEmpresarial ? 'empresarial' : 'lei');
 
   return (
     <div className="w-full bg-[#F8FAFC] py-8 sm:py-12">
@@ -60,61 +54,75 @@ export const HubPage: React.FC = () => {
         </div>
 
         {/* LISTAGEM DE PUBLICAÇÕES DO HUB */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayArticles.map((art) => (
-            <article
-              key={art.id}
-              onClick={() => navigate(`/materia/${art.id}`)}
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group border border-gray-200 cursor-pointer"
-            >
-              <div>
-                <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                  <img
-                    src={art.imageUrl}
-                    alt={art.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <span
-                    className={`absolute top-3 left-3 px-2.5 py-0.5 rounded text-white text-[10px] font-bold uppercase tracking-wider ${
-                      art.contentType === 'artigo' ? 'bg-indigo-900/90' : 'bg-[#0E1B2B]/90'
-                    }`}
-                  >
-                    {art.contentType === 'artigo' ? 'ARTIGO DE OPINIÃO' : art.category}
+        {displayArticles.length === 0 ? (
+          <div className="bg-white rounded-2xl p-12 text-center border border-gray-200 shadow-sm">
+            <HubIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-[#0b1c30]">
+              Nenhuma publicação em {hubTitle} no momento
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Novos conteúdos deste ambiente aparecerão aqui assim que forem publicados.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayArticles.map((art) => (
+              <article
+                key={art.id}
+                onClick={() => navigate(`/materia/${art.id}`)}
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group border border-gray-200 cursor-pointer"
+              >
+                <div>
+                  <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                    <img
+                      src={art.imageUrl}
+                      alt={art.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <span
+                      className={`absolute top-3 left-3 px-2.5 py-0.5 rounded text-white text-[10px] font-bold uppercase tracking-wider ${
+                        art.contentType === 'artigo' ? 'bg-indigo-900/90' : 'bg-[#0E1B2B]/90'
+                      }`}
+                    >
+                      {art.contentType === 'artigo' ? 'ARTIGO DE OPINIÃO' : art.category}
+                    </span>
+                  </div>
+
+                  <div className="p-5 flex flex-col gap-2">
+                    {art.columnist?.name && (
+                      <div className="flex items-center gap-2 mb-1">
+                        {art.columnist.avatarUrl && (
+                          <img
+                            src={art.columnist.avatarUrl}
+                            alt={art.columnist.name}
+                            className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                          />
+                        )}
+                        <span className="text-xs text-gray-600 font-semibold truncate">
+                          Por {art.columnist.name}
+                        </span>
+                      </div>
+                    )}
+
+                    <h3 className="text-base font-bold text-[#0b1c30] group-hover:text-[#006d3f] transition-colors line-clamp-2 leading-snug">
+                      {art.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                      {art.subtitle}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="px-5 py-3 bg-[#f8f9ff] flex items-center justify-between text-xs text-gray-400 border-t border-gray-100">
+                  <span>{art.publishedAt}</span>
+                  <span className="text-[#006d3f] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    Ler análise <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
-
-                <div className="p-5 flex flex-col gap-2">
-                  {art.columnist && (
-                    <div className="flex items-center gap-2 mb-1">
-                      <img
-                        src={art.columnist.avatarUrl}
-                        alt={art.columnist.name}
-                        className="w-6 h-6 rounded-full object-cover border border-gray-200"
-                      />
-                      <span className="text-xs text-gray-600 font-semibold truncate">
-                        Por {art.columnist.name}
-                      </span>
-                    </div>
-                  )}
-
-                  <h3 className="text-base font-bold text-[#0b1c30] group-hover:text-[#006d3f] transition-colors line-clamp-2 leading-snug">
-                    {art.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                    {art.subtitle}
-                  </p>
-                </div>
-              </div>
-
-              <div className="px-5 py-3 bg-[#f8f9ff] flex items-center justify-between text-xs text-gray-400 border-t border-gray-100">
-                <span>{art.publishedAt}</span>
-                <span className="text-[#006d3f] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Ler análise <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

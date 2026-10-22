@@ -18,9 +18,15 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({ onOpenAdModal }) => {
   const navigate = useNavigate();
   const [selectedTopic, setSelectedTopic] = useState('todos');
-  const { articles, mainFeaturedArticle, secondaryLeadArticles } = usePortalData();
+  const {
+    articles,
+    mainFeaturedArticle,
+    secondaryLeadArticles,
+    getArticlesByCategory,
+    getArticlesByHub,
+  } = usePortalData();
 
-  // Filtragem inteligente por tópicos
+  // Filtragem inteligente e dinâmica por editorias cadastradas no banco
   const displayedArticles = useMemo(() => {
     const secondaryIds = new Set(secondaryLeadArticles.map((s) => s.id));
     if (selectedTopic === 'todos') {
@@ -28,82 +34,72 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenAdModal }) => {
         .filter((a) => a.id !== mainFeaturedArticle?.id && !secondaryIds.has(a.id))
         .slice(0, 6);
     }
-    if (selectedTopic === 'agro') {
-      return articles.filter((a) => a.category.toLowerCase().includes('agro'));
-    }
-    if (selectedTopic === 'cidade') {
-      return articles.filter((a) => a.category.toLowerCase().includes('cidade'));
-    }
-    if (selectedTopic === 'politica') {
-      return articles.filter((a) => a.category.toLowerCase().includes('pol'));
-    }
-    if (selectedTopic === 'saude') {
-      return articles.filter((a) => a.category.toLowerCase().includes('saúde'));
-    }
-    if (selectedTopic === 'economia') {
-      return articles.filter((a) => a.category.toLowerCase().includes('economia'));
-    }
-    if (selectedTopic === 'geopolitica') {
-      return articles.filter((a) => a.category.toLowerCase().includes('geo'));
-    }
     if (selectedTopic === 'empresarial') {
-      return articles.filter((a) => a.hubType === 'empresarial');
+      return getArticlesByHub('empresarial');
     }
     if (selectedTopic === 'lei') {
-      return articles.filter((a) => a.hubType === 'lei');
+      return getArticlesByHub('lei');
     }
-    return articles.slice(3, 9);
-  }, [selectedTopic, articles, mainFeaturedArticle, secondaryLeadArticles]);
+    return getArticlesByCategory(selectedTopic);
+  }, [
+    selectedTopic,
+    articles,
+    mainFeaturedArticle,
+    secondaryLeadArticles,
+    getArticlesByCategory,
+    getArticlesByHub,
+  ]);
 
   const handleArticleClick = (article: Article) => {
     navigate(`/materia/${article.id}`);
   };
 
   return (
-    <div className="w-full">
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 w-full">
-        {/* ESPAÇO PUBLICITÁRIO: SUPERBANNER ROTATIVO */}
-        <AdBanner
-          type="leaderboard"
-          variant="rotating"
-          onOpenAdModal={onOpenAdModal}
-          className="mb-6"
-        />
+    <div className="max-w-7xl mx-auto px-4 lg:px-8 pt-6 pb-8">
+      {/* 1. SUPERBANNER PUBLICITÁRIO DE TOPO (SÓ EXIBE SE HOUVER PATROCINADOR CADASTRADO) */}
+      <AdBanner
+        type="leaderboard"
+        variant="rotating"
+        autoRotateInterval={5500}
+        onOpenAdModal={onOpenAdModal}
+        className="mb-6"
+      />
 
-        {/* SEÇÃO HERO (MANCHETE PRINCIPAL + 2 CARDS SECUNDÁRIOS) */}
+      {/* 2. TRILHO DE EDITORIAS DINÂMICAS */}
+      <TopicsRail selectedTopic={selectedTopic} onSelectTopic={setSelectedTopic} />
+
+      {/* 3. MANCHETE PRINCIPAL + 2 SECUNDÁRIAS (SÓ EXIBE QUANDO HOUVER MATÉRIA CADASTRADA) */}
+      {mainFeaturedArticle && (
         <HeroSection
           mainArticle={mainFeaturedArticle}
           secondaryArticles={secondaryLeadArticles}
           onArticleClick={handleArticleClick}
         />
+      )}
 
-        {/* BARRA HORIZONTAL DE TEMAS EM DESTAQUE */}
-        <TopicsRail
-          selectedTopic={selectedTopic}
-          onSelectTopic={(topic) => setSelectedTopic(topic)}
-        />
+      {/* 4. GRADE DE NOTÍCIAS + WIDGET DE COTAÇÕES AUTOMÁTICAS */}
+      <NewsGrid articles={displayedArticles} onArticleClick={handleArticleClick} />
 
-        {/* SEÇÃO DO TEMPO MODELO CANAL RURAL */}
-        <WeatherSectionCanalRural />
+      {/* 5. VITRINE DE BANNERS QUADRADOS 300x300 (SÓ EXIBE SE HOUVER BANNER CADASTRADO) */}
+      <SquareBannersSection onOpenAdModal={onOpenAdModal} limit={3} />
 
-        {/* GRADE EDITORIAL DE NOTÍCIAS, ARTIGOS E COTAÇÕES DO CANAL RURAL */}
-        <NewsGrid
-          articles={displayedArticles}
-          onArticleClick={handleArticleClick}
-        />
+      {/* 6. PREVISÃO DO TEMPO AUTOMÁTICA (GOIÁS) */}
+      <WeatherSectionCanalRural />
 
-        {/* VITRINE DE BANNERS QUADRADOS (MREC 300x300) */}
-        <SquareBannersSection
-          onOpenAdModal={onOpenAdModal}
-          className="mb-10"
-        />
+      {/* 7. BANNER ROTATIVO INTERMEDIÁRIO (SÓ EXIBE SE HOUVER PATROCINADOR CADASTRADO) */}
+      <AdBanner
+        type="leaderboard"
+        variant="rotating"
+        autoRotateInterval={6500}
+        onOpenAdModal={onOpenAdModal}
+        className="mb-12"
+      />
 
-        {/* SEÇÃO ESPECIAL DOS 3 AMBIENTES (CONEXÃO EMPRESARIAL, COM A LEI, AGENDA DE EVENTOS) */}
-        <SpecialHubsSection />
+      {/* 8. OS 3 AMBIENTES ESPECIAIS CONEXÕES */}
+      <SpecialHubsSection />
 
-        {/* CARROSSEL DE ANUNCIANTES & MARCAS PARCEIRAS */}
-        <SponsorsCarousel onOpenAdModal={onOpenAdModal} className="mt-4" />
-      </div>
+      {/* 9. FAIXA COMERCIAL WHATSAPP & PATROCINADORES */}
+      <SponsorsCarousel onOpenAdModal={onOpenAdModal} />
     </div>
   );
 };

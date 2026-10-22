@@ -8,8 +8,8 @@ import {
   Building2,
   Scale,
   Calendar,
-  Compass,
 } from 'lucide-react';
+import { usePortalData } from '../context/PortalDataContext';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -20,16 +20,14 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick, onOpenAdModal }) 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hubsDropdownOpen, setHubsDropdownOpen] = useState(false);
   const location = useLocation();
+  const { categories } = usePortalData();
 
-  // As 6 categorias oficiais solicitadas pelo cliente
-  const categoryLinks = [
-    { path: '/categoria/agro', label: 'AGRO' },
-    { path: '/categoria/cidade', label: 'CIDADE' },
-    { path: '/categoria/politica', label: 'POLÍTICA' },
-    { path: '/categoria/saude-e-bem-estar', label: 'SAÚDE' },
-    { path: '/categoria/economia', label: 'ECONOMIA' },
-    { path: '/categoria/geo-politica', label: 'GEOPOLÍTICA' },
-  ];
+  // Categorias dinâmicas vindas do banco de dados
+  const activeCategories = categories.filter((c) => c.isActive !== false);
+  const categoryLinks = activeCategories.map((c) => ({
+    path: `/categoria/${c.slug}`,
+    label: c.name.toUpperCase(),
+  }));
 
   // Os 3 ambientes especiais
   const specialHubs = [
@@ -50,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick, onOpenAdModal }) 
     {
       path: '/agenda-eventos',
       label: 'Agenda de Eventos',
-      desc: 'Calendário de Feiras e Feiras',
+      desc: 'Calendário de Feiras e Eventos',
       icon: Calendar,
       color: 'text-amber-400',
     },
@@ -72,8 +70,8 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick, onOpenAdModal }) 
           />
         </Link>
 
-        {/* NAVEGAÇÃO DESKTOP: CATEGORIAS OFICIAIS */}
-        <nav className="hidden xl:flex items-center gap-6 h-full">
+        {/* NAVEGAÇÃO DESKTOP: CATEGORIAS DINÂMICAS */}
+        <nav className="hidden xl:flex items-center gap-5 h-full overflow-x-auto scrollbar-none">
           <Link
             to="/"
             className={`text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors py-2 border-b-2 ${

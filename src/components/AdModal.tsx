@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, CheckCircle } from 'lucide-react';
+import { X, CheckCircle, Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
 import { usePortalData } from '../context/PortalDataContext';
+import { OFFICIAL_SITE_INFO, openRotatedWhatsApp } from '../utils/contactRotator';
 
 interface AdModalProps {
   isOpen: boolean;
@@ -41,10 +42,9 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
   };
 
   const handleWhatsAppCommercial = () => {
-    const text = encodeURIComponent(
-      'Olá! Gostaria de receber o Mídia Kit oficial e informações para anunciar no portal Conexões em FOCO Goiás.'
+    openRotatedWhatsApp(
+      'Olá! Gostaria de receber o Mídia Kit oficial e informações para anunciar no portal Conexões em FOCO.'
     );
-    window.open(`https://api.whatsapp.com/send?phone=5564992145066&text=${text}`, '_blank');
   };
 
   return (
@@ -85,23 +85,39 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-          Conecte sua empresa a mais de <strong>180.000 leitores e tomadores de decisão</strong> em Goiás: produtores rurais, diretores, investidores, advogados e lideranças econômicas.
+        <p className="text-gray-600 text-sm mb-5 leading-relaxed">
+          Conecte sua empresa a milhares de leitores e tomadores de decisão em Rio Verde e Goiás:
+          produtores rurais, diretores, investidores, advogados e lideranças econômicas.
         </p>
 
-        {/* MÉTRICAS EM DESTAQUE */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-[#f8f9ff] border border-gray-100 rounded-xl p-3 text-center">
-            <div className="text-lg sm:text-xl font-extrabold text-[#006d3f]">180k+</div>
-            <div className="text-[10px] sm:text-xs text-gray-500">Leituras / mês</div>
+        {/* CONTATOS OFICIAIS COMERCIAIS */}
+        <div className="bg-[#f8f9ff] border border-gray-200/80 rounded-xl p-4 mb-5 space-y-2 text-xs text-gray-700">
+          <div className="font-extrabold uppercase tracking-wider text-[#006d3f] text-[11px] mb-1">
+            Atendimento Comercial Direto:
           </div>
-          <div className="bg-[#f8f9ff] border border-gray-100 rounded-xl p-3 text-center">
-            <div className="text-lg sm:text-xl font-extrabold text-[#0E1B2B]">78%</div>
-            <div className="text-[10px] sm:text-xs text-gray-500">Público Classe A/B</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {OFFICIAL_SITE_INFO.contacts.map((c) => (
+              <div
+                key={c.phoneWa}
+                className="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-gray-100"
+              >
+                <Phone className="w-4 h-4 text-[#006d3f] shrink-0" />
+                <div>
+                  <div className="font-extrabold text-[#0b1c30]">{c.name}</div>
+                  <div className="text-gray-600 font-semibold">{c.phoneDisplay}</div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="bg-[#f8f9ff] border border-gray-100 rounded-xl p-3 text-center">
-            <div className="text-lg sm:text-xl font-extrabold text-[#4178A7]">Goiás & CO</div>
-            <div className="text-[10px] sm:text-xs text-gray-500">Cobertura Regional</div>
+          <div className="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-gray-500">
+            <span className="flex items-center gap-1">
+              <Mail className="w-3.5 h-3.5 text-[#006d3f]" />
+              {OFFICIAL_SITE_INFO.email}
+            </span>
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-[#006d3f]" />
+              {OFFICIAL_SITE_INFO.address}
+            </span>
           </div>
         </div>
 
@@ -121,11 +137,11 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
             </div>
             <div className="flex items-center gap-1.5 p-2 rounded-lg bg-gray-50 border border-gray-100">
               <CheckCircle className="w-4 h-4 text-[#006d3f] shrink-0" />
-              <span>Banners Laterais nas Matérias</span>
+              <span>Banners Quadrados (300x300)</span>
             </div>
             <div className="flex items-center gap-1.5 p-2 rounded-lg bg-gray-50 border border-gray-100">
               <CheckCircle className="w-4 h-4 text-[#006d3f] shrink-0" />
-              <span>Patrocínio do Ticker de Cotações</span>
+              <span>Conexão Empresarial & Eventos</span>
             </div>
           </div>
         </div>
@@ -164,7 +180,9 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">WhatsApp / Telefone</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  WhatsApp / Telefone
+                </label>
                 <input
                   type="tel"
                   required
@@ -175,7 +193,9 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Formato de Interesse</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Formato de Interesse
+                </label>
                 <select
                   value={interest}
                   onChange={(e) => setInterest(e.target.value)}
@@ -183,8 +203,8 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
                 >
                   <option>Superbanner Topo</option>
                   <option>Publieditorial Patrocinado</option>
-                  <option>Banner Lateral nas Notícias</option>
-                  <option>Patrocínio de Cotações / Clima</option>
+                  <option>Banner Quadrado (300x300)</option>
+                  <option>Conexão Empresarial</option>
                   <option>Outros / Pacote Completo</option>
                 </select>
               </div>
@@ -193,16 +213,17 @@ export const AdModal: React.FC<AdModalProps> = ({ isOpen, onClose }) => {
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <button
                 type="submit"
-                className="w-full sm:flex-1 py-2.5 rounded-xl bg-[#006d3f] hover:bg-[#00522e] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+                className="w-full sm:flex-1 py-2.5 rounded-xl bg-[#006d3f] hover:bg-[#00522e] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
               >
                 Solicitar Proposta Comercial
               </button>
               <button
                 type="button"
                 onClick={handleWhatsAppCommercial}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
               >
-                <span>Falar no WhatsApp</span>
+                <MessageCircle className="w-4 h-4" />
+                <span>Chamar no WhatsApp</span>
               </button>
             </div>
           </form>

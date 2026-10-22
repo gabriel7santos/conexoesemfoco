@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, FileText } from 'lucide-react';
+import { OFFICIAL_SITE_INFO } from '../utils/contactRotator';
 
 export const TermsPage: React.FC = () => {
   return (
@@ -49,7 +50,7 @@ export const TermsPage: React.FC = () => {
                 2. Propriedade Intelectual & Direitos Autorais
               </h2>
               <p>
-                Todos os textos, reportagens, matérias investigativas, fotografias autorais, infográficos, logomarcas e marcas nominativas exibidas neste portal são de propriedade exclusiva da <strong>Conexões em FOCO Comunicação Ltda</strong> ou de seus parceiros e articulistas licenciados. É vedada a reprodução comercial sem prévia autorização e sem a devida citação da fonte original.
+                Todos os textos, reportagens, matérias investigativas, fotografias autorais, infográficos, logomarcas e marcas nominativas exibidas neste portal são de propriedade exclusiva do <strong>Conexões em FOCO</strong> ou de seus parceiros e articulistas licenciados. É vedada a reprodução comercial sem prévia autorização e sem a devida citação da fonte original.
               </p>
             </section>
 
@@ -72,7 +73,7 @@ export const TermsPage: React.FC = () => {
             </section>
 
             <div className="pt-6 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-              <span>Goiânia – Goiás, Outubro de 2026</span>
+              <span>{OFFICIAL_SITE_INFO.address}</span>
               <Link to="/privacidade-lgpd" className="text-[#006d3f] font-bold hover:underline">
                 Política de Privacidade &rarr;
               </Link>

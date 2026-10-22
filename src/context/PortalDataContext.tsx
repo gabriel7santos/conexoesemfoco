@@ -5,8 +5,9 @@ import {
   AdBannerRecord,
   LeadRecord,
   MarketQuote,
+  CategoryRecord,
 } from '../types';
-import { allArticles as initialMockArticles, mockEvents as initialMockEvents, mockQuotes } from '../data/mockNews';
+import { mockQuotes } from '../data/mockNews';
 import {
   supabase,
   mapRowToArticle,
@@ -14,25 +15,93 @@ import {
   mapRowToEvent,
   mapRowToBanner,
   mapRowToLead,
+  mapRowToCategory,
 } from '../lib/supabase';
+
+const DEFAULT_CATEGORIES: CategoryRecord[] = [
+  {
+    id: 'agro',
+    name: 'Agro',
+    slug: 'agro',
+    color: '#006d3f',
+    description:
+      'Inteligência de safras, tecnologia de precisão, insumos e o dia a dia do produtor rural goiano.',
+    displayOrder: 1,
+    isActive: true,
+  },
+  {
+    id: 'cidade',
+    name: 'Cidade',
+    slug: 'cidade',
+    color: '#004E86',
+    description:
+      'Infraestrutura urbana, desenvolvimento regional e acontecimentos em Rio Verde, Jataí, Goiânia e região.',
+    displayOrder: 2,
+    isActive: true,
+  },
+  {
+    id: 'politica',
+    name: 'Política',
+    slug: 'politica',
+    color: '#b45309',
+    description:
+      'Decisões do governo, legislação, políticas públicas e o impacto das medidas estaduais no setor produtivo.',
+    displayOrder: 3,
+    isActive: true,
+  },
+  {
+    id: 'saude-e-bem-estar',
+    name: 'Saúde e Bem Estar',
+    slug: 'saude-e-bem-estar',
+    color: '#0d9488',
+    description:
+      'Medicina preventiva, longevidade, qualidade de vida, avanços hospitalares e saúde ocupacional.',
+    displayOrder: 4,
+    isActive: true,
+  },
+  {
+    id: 'economia',
+    name: 'Economia',
+    slug: 'economia',
+    color: '#1e3a8a',
+    description:
+      'Indicadores financeiros, cotações, investimentos industriais e crescimento econômico no Centro-Oeste.',
+    displayOrder: 5,
+    isActive: true,
+  },
+  {
+    id: 'geo-politica',
+    name: 'Geo Política',
+    slug: 'geo-politica',
+    color: '#4338ca',
+    description:
+      'Relações internacionais, balança comercial, exportações e o posicionamento de Goiás no mundo.',
+    displayOrder: 6,
+    isActive: true,
+  },
+];
 
 interface PortalDataContextType {
   articles: Article[];
   events: EventItem[];
   banners: AdBannerRecord[];
   leads: LeadRecord[];
+  categories: CategoryRecord[];
   quotes: MarketQuote[];
   loading: boolean;
-  mainFeaturedArticle: Article;
+  mainFeaturedArticle: Article | null;
   secondaryLeadArticles: Article[];
   getArticleById: (id: string) => Article | undefined;
-  getArticlesByCategory: (category: string) => Article[];
+  getArticlesByCategory: (categoryOrSlug: string) => Article[];
   getArticlesByHub: (hubType: 'empresarial' | 'lei' | 'eventos') => Article[];
   getRelatedArticles: (currentId: string, category: string, limit?: number) => Article[];
   saveArticle: (article: Article) => Promise<void>;
   deleteArticle: (id: string) => Promise<void>;
   setMainLeadArticle: (id: string) => Promise<void>;
   toggleSecondaryLeadArticle: (id: string) => Promise<void>;
+  saveCategory: (category: CategoryRecord) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
+  toggleCategoryActive: (id: string, isActive: boolean) => Promise<void>;
   saveEvent: (event: EventItem) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
   saveBanner: (banner: AdBannerRecord) => Promise<void>;
@@ -53,28 +122,39 @@ interface PortalDataContextType {
 
 const PortalDataContext = createContext<PortalDataContextType | undefined>(undefined);
 
+function normalizeSlug(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
 export const PortalDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [articles, setArticles] = useState<Article[]>(initialMockArticles);
-  const [events, setEvents] = useState<EventItem[]>(initialMockEvents);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [banners, setBanners] = useState<AdBannerRecord[]>([]);
   const [leads, setLeads] = useState<LeadRecord[]>([]);
+  const [categories, setCategories] = useState<CategoryRecord[]>(DEFAULT_CATEGORIES);
   const [quotes, setQuotes] = useState<MarketQuote[]>(mockQuotes);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchAllFromSupabase = useCallback(async () => {
     try {
       setLoading(true);
-      const [artRes, evRes, banRes, leadRes] = await Promise.all([
+      const [artRes, evRes, banRes, leadRes, catRes] = await Promise.all([
         supabase.from('articles').select('*').order('created_at', { ascending: false }),
         supabase.from('events').select('*').order('created_at', { ascending: false }),
         supabase.from('ad_banners').select('*').order('display_order', { ascending: true }),
         supabase.from('leads').select('*').order('created_at', { ascending: false }),
+        supabase.from('categories').select('*').order('display_order', { ascending: true }),
       ]);
 
-      if (!artRes.error && artRes.data && artRes.data.length > 0) {
+      if (!artRes.error && artRes.data) {
         setArticles(artRes.data.map(mapRowToArticle));
       }
-      if (!evRes.error && evRes.data && evRes.data.length > 0) {
+      if (!evRes.error && evRes.data) {
         setEvents(evRes.data.map(mapRowToEvent));
       }
       if (!banRes.error && banRes.data) {
@@ -83,8 +163,11 @@ export const PortalDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       if (!leadRes.error && leadRes.data) {
         setLeads(leadRes.data.map(mapRowToLead));
       }
+      if (!catRes.error && catRes.data && catRes.data.length > 0) {
+        setCategories(catRes.data.map(mapRowToCategory));
+      }
     } catch (err) {
-      console.warn('Usando dados em cache local:', err);
+      console.warn('Erro ao buscar dados do Supabase:', err);
     } finally {
       setLoading(false);
     }
@@ -127,15 +210,16 @@ export const PortalDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const publishedArticles = articles.filter((a) => a.isPublished !== false);
 
-  const mainFeaturedArticle =
-    publishedArticles.find((a) => a.isMainLead) || publishedArticles[0] || initialMockArticles[0];
+  const mainFeaturedArticle: Article | null =
+    publishedArticles.find((a) => a.isMainLead) || publishedArticles[0] || null;
 
   const secondaryLeadArticles = (() => {
+    if (!mainFeaturedArticle) return [];
     const secs = publishedArticles.filter(
-      (a) => a.isSecondaryLead && a.id !== mainFeaturedArticle?.id
+      (a) => a.isSecondaryLead && a.id !== mainFeaturedArticle.id
     );
     if (secs.length >= 2) return secs.slice(0, 2);
-    const others = publishedArticles.filter((a) => a.id !== mainFeaturedArticle?.id);
+    const others = publishedArticles.filter((a) => a.id !== mainFeaturedArticle.id);
     return others.slice(0, 2);
   })();
 
@@ -145,23 +229,32 @@ export const PortalDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   const getArticlesByCategory = useCallback(
-    (category: string) => {
-      const norm = category.toLowerCase().trim();
-      if (norm === 'noticias' || norm === 'notícias' || norm === 'todas') {
+    (categoryOrSlug: string) => {
+      const norm = normalizeSlug(categoryOrSlug);
+      if (norm === 'noticias' || norm === 'todas' || norm === 'todos') {
         return publishedArticles;
       }
+
+      // Verifica se bate com alguma categoria cadastrada no banco
+      const matchedCat = categories.find(
+        (c) => normalizeSlug(c.slug) === norm || normalizeSlug(c.name) === norm || c.id === norm
+      );
+
       return publishedArticles.filter((a) => {
-        const artCat = a.category.toLowerCase().trim();
-        if (norm === 'agro' && artCat === 'agro') return true;
-        if (norm === 'cidade' && artCat === 'cidade') return true;
-        if (norm === 'politica' || norm === 'política') return artCat.includes('pol');
-        if (norm.includes('saude') || norm.includes('saúde')) return artCat.includes('saúde');
-        if (norm === 'economia' && artCat === 'economia') return true;
-        if (norm.includes('geo')) return artCat.includes('geo');
-        return artCat === norm;
+        const artSlug = normalizeSlug(a.category);
+        if (artSlug === norm) return true;
+        if (matchedCat) {
+          return (
+            artSlug === normalizeSlug(matchedCat.name) ||
+            artSlug === normalizeSlug(matchedCat.slug)
+          );
+        }
+        if (norm === 'saude' && artSlug.includes('saude')) return true;
+        if (norm === 'geopolitica' && artSlug.includes('geo')) return true;
+        return false;
       });
     },
-    [publishedArticles]
+    [publishedArticles, categories]
   );
 
   const getArticlesByHub = useCallback(
@@ -222,6 +315,39 @@ export const PortalDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       .update({ is_secondary_lead: nextVal, is_main_lead: false })
       .eq('id', id);
     await fetchAllFromSupabase();
+  };
+
+  // CRUD DE CATEGORIAS DINÂMICAS
+  const saveCategory = async (category: CategoryRecord) => {
+    const slug = normalizeSlug(category.slug || category.name);
+    const id = category.id.trim() || slug;
+    const row = {
+      id,
+      name: category.name.trim(),
+      slug,
+      color: category.color || '#006d3f',
+      description: category.description || '',
+      display_order: category.displayOrder || categories.length + 1,
+      is_active: category.isActive !== false,
+    };
+    const { error } = await supabase.from('categories').upsert(row, { onConflict: 'id' });
+    if (error) throw error;
+    await fetchAllFromSupabase();
+  };
+
+  const deleteCategory = async (id: string) => {
+    const { error } = await supabase.from('categories').delete().eq('id', id);
+    if (error) throw error;
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  const toggleCategoryActive = async (id: string, isActive: boolean) => {
+    const { error } = await supabase
+      .from('categories')
+      .update({ is_active: isActive })
+      .eq('id', id);
+    if (error) throw error;
+    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, isActive } : c)));
   };
 
   // CRUD DE EVENTOS
@@ -328,6 +454,7 @@ export const PortalDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         events,
         banners,
         leads,
+        categories,
         quotes,
         loading,
         mainFeaturedArticle,
@@ -340,6 +467,9 @@ export const PortalDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         deleteArticle,
         setMainLeadArticle,
         toggleSecondaryLeadArticle,
+        saveCategory,
+        deleteCategory,
+        toggleCategoryActive,
         saveEvent,
         deleteEvent,
         saveBanner,

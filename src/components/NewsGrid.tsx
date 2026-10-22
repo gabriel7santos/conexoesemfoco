@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Newspaper } from 'lucide-react';
 import { Article } from '../types';
 import { MarketQuotesCanalRural } from './MarketQuotesCanalRural';
 
@@ -18,7 +18,7 @@ const NewsCardItem: React.FC<{
   return (
     <article
       onClick={onClick}
-      className="bg-white rounded-xl shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group border border-gray-200 cursor-pointer h-full"
+      className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group border border-gray-200 cursor-pointer h-full"
     >
       <div>
         {/* Imagem do Card */}
@@ -68,7 +68,7 @@ const NewsCardItem: React.FC<{
           )}
 
           {/* Se for Publi, exibe o Patrocinador */}
-          {isPubli && article.sponsor && (
+          {isPubli && article.sponsor?.name && (
             <div className="flex items-center gap-1.5 text-[11px] text-amber-800 font-semibold bg-amber-50 px-2 py-1 rounded">
               <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span>Patrocinado por: {article.sponsor.name}</span>
@@ -108,9 +108,7 @@ const NewsCardItem: React.FC<{
 };
 
 export const NewsGrid: React.FC<NewsGridProps> = ({ articles, onArticleClick }) => {
-  // Primeiras 3 matérias que ficam lado a lado com o widget de Cotações (idêntico ao Canal Rural)
   const topArticles = articles.slice(0, 3);
-  // Matérias restantes que ficam na grade inferior
   const remainingArticles = articles.slice(3);
 
   return (
@@ -123,19 +121,30 @@ export const NewsGrid: React.FC<NewsGridProps> = ({ articles, onArticleClick }) 
               ÚLTIMAS NOTÍCIAS & MERCADO
             </h2>
             <p className="text-xs text-gray-500">
-              Cobertura jornalística, cotações ao vivo do Canal Rural/CEPEA e análises de Goiás
+              Cobertura jornalística, cotações ao vivo e análises de Goiás
             </p>
           </div>
         </div>
       </div>
 
-      {/* LINHA 1 (MODELO EXATO CANAL RURAL): 3 CARDS DE NOTÍCIAS + WIDGET COTAÇÕES MERCADO FÍSICO */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch mb-8">
-        {topArticles.map((article) => (
-          <div key={article.id} className="h-full">
-            <NewsCardItem article={article} onClick={() => onArticleClick(article)} />
+        {topArticles.length > 0 ? (
+          topArticles.map((article) => (
+            <div key={article.id} className="h-full">
+              <NewsCardItem article={article} onClick={() => onArticleClick(article)} />
+            </div>
+          ))
+        ) : (
+          <div className="md:col-span-2 lg:col-span-3 bg-white rounded-2xl border border-gray-200 p-10 flex flex-col items-center justify-center text-center shadow-sm">
+            <Newspaper className="w-12 h-12 text-gray-300 mb-3" />
+            <h3 className="text-base font-extrabold text-[#0b1c30]">
+              Redação em Preparação de Pauta
+            </h3>
+            <p className="text-xs text-gray-500 mt-1 max-w-md">
+              As novas reportagens e análises editoriais aparecerão automaticamente neste espaço assim que forem publicadas no Painel Administrativo.
+            </p>
           </div>
-        ))}
+        )}
 
         {/* 4ª COLUNA: WIDGET EXCLUSIVO DE COTAÇÕES MODELO CANAL RURAL */}
         <div className="lg:col-span-1 h-full flex flex-col">
@@ -143,7 +152,6 @@ export const NewsGrid: React.FC<NewsGridProps> = ({ articles, onArticleClick }) 
         </div>
       </div>
 
-      {/* LINHA 2: MATÉRIAS RESTANTES DA SEÇÃO */}
       {remainingArticles.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {remainingArticles.map((article) => (

@@ -1,5 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
-import { Article, EventItem, AdBannerRecord, LeadRecord } from '../types';
+import {
+  Article,
+  EventItem,
+  AdBannerRecord,
+  LeadRecord,
+  CategoryRecord,
+} from '../types';
 
 const metaEnv = (import.meta as any).env || {};
 const SUPABASE_URL =
@@ -49,6 +55,18 @@ export async function uploadMediaFile(
   }
 }
 
+export function mapRowToCategory(row: any): CategoryRecord {
+  return {
+    id: row.id,
+    name: row.name || '',
+    slug: row.slug || row.id || '',
+    color: row.color || '#006d3f',
+    description: row.description || '',
+    displayOrder: Number(row.display_order || 1),
+    isActive: row.is_active !== false,
+  };
+}
+
 export function mapRowToArticle(row: any): Article {
   const contentArr = Array.isArray(row.content)
     ? row.content
@@ -64,10 +82,9 @@ export function mapRowToArticle(row: any): Article {
     categoryColor: row.category_color || undefined,
     contentType: row.content_type || 'materia',
     hubType: row.hub_type || null,
-    imageUrl:
-      row.image_url ||
-      'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1200&q=80',
+    imageUrl: row.image_url || '',
     imageAlt: row.image_alt || row.title || '',
+    imageCredit: row.image_credit || '',
     publishedAt: row.published_at || 'Publicado hoje',
     readTime: row.read_time || '4 min de leitura',
     author: row.author || 'Redação Conexões',
@@ -98,6 +115,7 @@ export function mapArticleToRow(article: Partial<Article> & { id: string; title:
     hub_type: article.hubType || null,
     image_url: article.imageUrl || '',
     image_alt: article.imageAlt || article.title,
+    image_credit: article.imageCredit || null,
     published_at: article.publishedAt || 'Publicado hoje',
     read_time: article.readTime || '4 min de leitura',
     author: article.author || 'Redação Conexões',
@@ -125,9 +143,7 @@ export function mapRowToEvent(row: any): EventItem {
     time: row.time || '',
     location: row.location || '',
     city: row.city || 'Rio Verde - GO',
-    imageUrl:
-      row.image_url ||
-      'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80',
+    imageUrl: row.image_url || '',
     description: row.description || '',
     linkUrl: row.link_url || undefined,
     isActive: row.is_active !== false,

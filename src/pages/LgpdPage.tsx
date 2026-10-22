@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Scale } from 'lucide-react';
+import { OFFICIAL_SITE_INFO } from '../utils/contactRotator';
 
 export const LgpdPage: React.FC = () => {
   return (
@@ -40,7 +41,7 @@ export const LgpdPage: React.FC = () => {
                 1. Compromisso com a Privacidade
               </h2>
               <p>
-                O portal <strong>Conexões em FOCO</strong>, sediado em Goiás, preza pela transparência, integridade e segurança no tratamento das informações de seus leitores, parceiros comerciais e anunciantes. Esta Política explica como coletamos, utilizamos, armazenamos e protegemos seus dados pessoais.
+                O portal <strong>Conexões em FOCO</strong>, sediado em {OFFICIAL_SITE_INFO.address}, preza pela transparência, integridade e segurança no tratamento das informações de seus leitores, parceiros comerciais e anunciantes. Esta Política explica como coletamos, utilizamos, armazenamos e protegemos seus dados pessoais.
               </p>
             </section>
 
@@ -82,15 +83,15 @@ export const LgpdPage: React.FC = () => {
 
             <section>
               <h2 className="text-base font-bold text-[#0b1c30] uppercase mb-2">
-                5. Contato do Encarregado de Dados (DPO)
+                5. Contato e Atendimento Oficial
               </h2>
               <p>
-                Para exercer seus direitos ou tirar dúvidas sobre esta política, entre em contato diretamente pelo e-mail: <strong className="text-[#006d3f]">privacidade@conexoesemfoco.com.br</strong> ou pelo WhatsApp oficial indicado no rodapé.
+                Para exercer seus direitos ou tirar dúvidas sobre esta política, entre em contato diretamente pelo e-mail: <strong className="text-[#006d3f]">{OFFICIAL_SITE_INFO.email}</strong> ou pelos telefones/WhatsApp oficiais no rodapé ({OFFICIAL_SITE_INFO.contacts.map((c) => `${c.phoneDisplay} - ${c.name}`).join(' | ')}).
               </p>
             </section>
 
             <div className="pt-6 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-              <span>Última atualização: Outubro de 2026</span>
+              <span>{OFFICIAL_SITE_INFO.address}</span>
               <Link to="/termos-de-uso" className="text-[#006d3f] font-bold hover:underline">
                 Ver Termos de Uso &rarr;
               </Link>

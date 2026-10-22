@@ -8,10 +8,11 @@ import {
   Copy,
   Flame,
   ChevronRight,
+  Camera,
 } from 'lucide-react';
 import { usePortalData } from '../context/PortalDataContext';
 import { AdBanner } from '../components/AdBanner';
-import { SquareBanner, mockSquareAds } from '../components/SquareBanner';
+import { SquareBanner } from '../components/SquareBanner';
 import { MarketQuotesCanalRural } from '../components/MarketQuotesCanalRural';
 
 interface ArticlePageProps {
@@ -77,7 +78,11 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
           </Link>
           <span>/</span>
           <Link
-            to={`/categoria/${article.category.toLowerCase()}`}
+            to={`/categoria/${article.category
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/[^a-z0-9]+/g, '-')}`}
             className="hover:text-[#006d3f] transition-colors font-semibold uppercase text-[#006d3f]"
           >
             {article.category}
@@ -138,8 +143,8 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
             </p>
           )}
 
-          {/* SINALIZAÇÃO DE PUBLIEDITORIAL SE FOR PUBLI */}
-          {isPubli && article.sponsor && (
+          {/* SINALIZAÇÃO DE PUBLIEDITORIAL SE FOR PUBLI E TIVER PATROCINADOR */}
+          {isPubli && article.sponsor?.name && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 mb-6 flex items-center justify-between text-xs text-amber-900">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-amber-600 shrink-0" />
@@ -180,14 +185,14 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
               <button
                 onClick={handleShareWhatsApp}
                 type="button"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs font-bold transition-all shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
               >
                 <span>WhatsApp</span>
               </button>
               <button
                 onClick={handleCopyLink}
                 type="button"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold transition-all shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold transition-all shadow-sm cursor-pointer"
               >
                 {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                 <span>{copied ? 'Copiado!' : 'Copiar Link'}</span>
@@ -200,18 +205,27 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* COLUNA ESQUERDA: CORPO DA MATÉRIA */}
           <article className="lg:col-span-8 flex flex-col gap-6">
-            {/* IMAGEM PRINCIPAL */}
-            <div className="relative rounded-2xl overflow-hidden bg-gray-900 shadow-md">
-              <img
-                src={article.imageUrl}
-                alt={article.imageAlt || article.title}
-                className="w-full h-auto max-h-[500px] object-cover"
-              />
-              <div className="bg-[#0b1c30]/90 text-gray-300 text-xs px-4 py-2 flex items-center justify-between">
-                <span>{article.imageAlt || 'Registro da atividade em Goiás'}</span>
-                <span className="text-gray-400 text-[11px]">Foto: Divulgação / Conexões em FOCO</span>
+            {/* IMAGEM DE CAPA PRINCIPAL COM LEGENDA E AUTOR DA FOTO */}
+            {article.imageUrl && (
+              <div className="relative rounded-2xl overflow-hidden bg-gray-900 shadow-md">
+                <img
+                  src={article.imageUrl}
+                  alt={article.imageAlt || article.title}
+                  className="w-full h-auto max-h-[520px] object-cover"
+                />
+                {(article.imageAlt || article.imageCredit) && (
+                  <div className="bg-[#0b1c30]/95 text-gray-200 text-xs px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                    <span>{article.imageAlt || article.title}</span>
+                    {article.imageCredit && (
+                      <span className="text-[#7afbae] text-[11px] font-semibold flex items-center gap-1.5 ml-auto">
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>Foto: {article.imageCredit}</span>
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
             {/* CORPO DA PUBLICAÇÃO (SUPORTA HTML RICO ESTILO WORD E PARÁGRAFOS) */}
             {article.contentHtml ? (
@@ -230,13 +244,15 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
             )}
 
             {/* BOX DO COLUNISTA (SE FOR ARTIGO DE OPINIÃO OU CONEXÃO COM A LEI) */}
-            {(isArtigo || article.hubType === 'lei') && article.columnist && (
+            {(isArtigo || article.hubType === 'lei') && article.columnist?.name && (
               <div className="bg-[#f0f4ff] border border-[#d3e4fe] rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4 mt-4">
-                <img
-                  src={article.columnist.avatarUrl}
-                  alt={article.columnist.name}
-                  className="w-20 h-20 rounded-full object-cover border-2 border-indigo-600 shrink-0 shadow-md"
-                />
+                {article.columnist.avatarUrl && (
+                  <img
+                    src={article.columnist.avatarUrl}
+                    alt={article.columnist.name}
+                    className="w-20 h-20 rounded-full object-cover border-2 border-indigo-600 shrink-0 shadow-md"
+                  />
+                )}
                 <div className="text-center sm:text-left">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded">
                     COLUNISTA / ESPECIALISTA
@@ -260,7 +276,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
                 Palavras-chave relacionadas:
               </span>
               <div className="flex flex-wrap gap-2">
-                {['Goiás', article.category, 'Notícias', 'Economia', 'Rio Verde'].map((tag) => (
+                {['Goiás', article.category, 'Notícias', 'Rio Verde'].map((tag) => (
                   <span
                     key={tag}
                     className="px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium cursor-pointer transition-colors"
@@ -274,47 +290,49 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
 
           {/* COLUNA DIREITA: SIDEBAR (4 COLS) */}
           <aside className="lg:col-span-4 flex flex-col gap-6 w-full">
-            {/* ESPAÇO PUBLICITÁRIO SIDEBAR */}
+            {/* ESPAÇO PUBLICITÁRIO SIDEBAR (SÓ APARECE SE HOUVER BANNER ATIVO) */}
             <AdBanner type="sidebar" onOpenAdModal={onOpenAdModal} />
 
             {/* WIDGET COTAÇÕES MODELO CANAL RURAL */}
             <MarketQuotesCanalRural maxHeight="max-h-[380px]" />
 
-            {/* MAIS LIDAS */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-2 pb-3 border-b border-gray-100 mb-4">
-                <Flame className="w-5 h-5 text-[#006d3f]" />
-                <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0b1c30]">
-                  Mais Lidas da Semana
-                </h3>
-              </div>
-              <div className="space-y-4">
-                {mostRead.map((item, idx) => (
-                  <div
-                    key={item.id}
-                    onClick={() => navigate(`/materia/${item.id}`)}
-                    className="flex items-start gap-3 cursor-pointer group"
-                  >
-                    <span className="text-2xl font-black text-gray-300 group-hover:text-[#006d3f] transition-colors leading-none w-6 shrink-0">
-                      0{idx + 1}
-                    </span>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold uppercase text-[#006d3f]">
-                        {item.category}
+            {/* MAIS LIDAS (SÓ EXIBE SE HOUVER OUTRAS MATÉRIAS) */}
+            {mostRead.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center gap-2 pb-3 border-b border-gray-100 mb-4">
+                  <Flame className="w-5 h-5 text-[#006d3f]" />
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0b1c30]">
+                    Mais Lidas da Semana
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  {mostRead.map((item, idx) => (
+                    <div
+                      key={item.id}
+                      onClick={() => navigate(`/materia/${item.id}`)}
+                      className="flex items-start gap-3 cursor-pointer group"
+                    >
+                      <span className="text-2xl font-black text-gray-300 group-hover:text-[#006d3f] transition-colors leading-none w-6 shrink-0">
+                        0{idx + 1}
                       </span>
-                      <h4 className="text-xs font-bold text-[#0b1c30] group-hover:text-[#006d3f] transition-colors line-clamp-2 leading-snug">
-                        {item.title}
-                      </h4>
-                      <span className="text-[10px] text-gray-400 mt-1">{item.publishedAt}</span>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold uppercase text-[#006d3f]">
+                          {item.category}
+                        </span>
+                        <h4 className="text-xs font-bold text-[#0b1c30] group-hover:text-[#006d3f] transition-colors line-clamp-2 leading-snug">
+                          {item.title}
+                        </h4>
+                        <span className="text-[10px] text-gray-400 mt-1">{item.publishedAt}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* SEGUNDO BANNER QUADRADO NA SIDEBAR */}
+            {/* SEGUNDO BANNER QUADRADO NA SIDEBAR (SÓ APARECE SE HOUVER BANNER ATIVO) */}
             <SquareBanner
-              ad={mockSquareAds[2]}
+              autoRotate={true}
               onOpenAdModal={onOpenAdModal}
               aspect="mrec"
               className="w-full"
@@ -323,56 +341,58 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ onOpenAdModal }) => {
         </div>
 
         {/* SEÇÃO INFERIOR: LEIA TAMBÉM */}
-        <section className="mt-14 pt-10 border-t border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-6 rounded bg-[#006d3f]"></div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[#0b1c30] uppercase tracking-tight">
-                LEIA TAMBÉM
-              </h2>
-            </div>
-            <Link
-              to="/categoria/noticias"
-              className="text-xs font-bold uppercase tracking-wider text-[#006d3f] hover:underline"
-            >
-              Ver mais notícias &rarr;
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedArticles.map((rel) => (
-              <div
-                key={rel.id}
-                onClick={() => navigate(`/materia/${rel.id}`)}
-                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md border border-gray-200 cursor-pointer group flex flex-col justify-between transition-all"
-              >
-                <div>
-                  <div className="h-44 w-full overflow-hidden bg-gray-100">
-                    <img
-                      src={rel.imageUrl}
-                      alt={rel.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-5 flex flex-col gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#006d3f]">
-                      {rel.category}
-                    </span>
-                    <h3 className="text-sm font-bold text-[#0b1c30] group-hover:text-[#006d3f] transition-colors line-clamp-2">
-                      {rel.title}
-                    </h3>
-                  </div>
-                </div>
-                <div className="px-5 pb-4 text-xs text-gray-400 flex items-center justify-between">
-                  <span>{rel.publishedAt}</span>
-                  <span className="text-[#006d3f] font-semibold flex items-center gap-0.5">
-                    Ler <ChevronRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
+        {relatedArticles.length > 0 && (
+          <section className="mt-14 pt-10 border-t border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-2.5 h-6 rounded bg-[#006d3f]"></div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#0b1c30] uppercase tracking-tight">
+                  LEIA TAMBÉM
+                </h2>
               </div>
-            ))}
-          </div>
-        </section>
+              <Link
+                to="/categoria/noticias"
+                className="text-xs font-bold uppercase tracking-wider text-[#006d3f] hover:underline"
+              >
+                Ver mais notícias &rarr;
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedArticles.map((rel) => (
+                <div
+                  key={rel.id}
+                  onClick={() => navigate(`/materia/${rel.id}`)}
+                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md border border-gray-200 cursor-pointer group flex flex-col justify-between transition-all"
+                >
+                  <div>
+                    <div className="h-44 w-full overflow-hidden bg-gray-100">
+                      <img
+                        src={rel.imageUrl}
+                        alt={rel.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-5 flex flex-col gap-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#006d3f]">
+                        {rel.category}
+                      </span>
+                      <h3 className="text-sm font-bold text-[#0b1c30] group-hover:text-[#006d3f] transition-colors line-clamp-2">
+                        {rel.title}
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="px-5 pb-4 text-xs text-gray-400 flex items-center justify-between">
+                    <span>{rel.publishedAt}</span>
+                    <span className="text-[#006d3f] font-semibold flex items-center gap-0.5">
+                      Ler <ChevronRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

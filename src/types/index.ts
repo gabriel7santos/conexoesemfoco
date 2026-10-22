@@ -6,7 +6,18 @@ export type MainCategory =
   | 'Política'
   | 'Saúde e Bem Estar'
   | 'Economia'
-  | 'Geo Política';
+  | 'Geo Política'
+  | string;
+
+export interface CategoryRecord {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+  description?: string;
+  displayOrder: number;
+  isActive: boolean;
+}
 
 export interface Article {
   id: string;
@@ -17,6 +28,7 @@ export interface Article {
   contentType: ContentType;
   imageUrl: string;
   imageAlt?: string;
+  imageCredit?: string;
   publishedAt: string;
   readTime: string;
   author: string;
@@ -110,7 +122,7 @@ export interface CityWeatherData {
 export interface EventItem {
   id: string;
   title: string;
-  category: 'Agro' | 'Negócios' | 'Cultura' | 'Institucional';
+  category: 'Agro' | 'Negócios' | 'Cultura' | 'Institucional' | string;
   date: string;
   time: string;
   location: string;

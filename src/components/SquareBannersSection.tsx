@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowUpRight, Sparkles } from 'lucide-react';
-import { SquareBanner, mockSquareAds, resolveLogoComponent, SquareAdItem } from './SquareBanner';
+import { SquareBanner, resolveLogoComponent, SquareAdItem } from './SquareBanner';
 import { usePortalData } from '../context/PortalDataContext';
 
 interface SquareBannersSectionProps {
@@ -33,8 +33,12 @@ export const SquareBannersSection: React.FC<SquareBannersSectionProps> = ({
       LogoComponent: resolveLogoComponent(b.logoKey, b.logoUrl),
     }));
 
-  const pool = dbSquareBanners.length > 0 ? dbSquareBanners : mockSquareAds;
-  const selectedAds = pool.slice(0, limit);
+  // Quando não houver patrocinadores quadrados cadastrados, não exibir a seção
+  if (dbSquareBanners.length === 0) {
+    return null;
+  }
+
+  const selectedAds = dbSquareBanners.slice(0, limit);
 
   return (
     <section className={`w-full mb-12 ${className}`}>
@@ -61,7 +65,7 @@ export const SquareBannersSection: React.FC<SquareBannersSectionProps> = ({
           <button
             type="button"
             onClick={onOpenAdModal}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#004E86] hover:bg-[#00375f] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#004E86] hover:bg-[#00375f] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
           >
             <span>Reservar Espaço Quadrado</span>
             <ArrowUpRight className="w-3.5 h-3.5" />

@@ -20,56 +20,59 @@ interface CategoryPageProps {
   onOpenAdModal?: () => void;
 }
 
+function getCategoryIconBySlug(slug: string): LucideIcon {
+  if (slug.includes('agro')) return Sprout;
+  if (slug.includes('cidade')) return Building;
+  if (slug.includes('pol')) return Landmark;
+  if (slug.includes('saude')) return HeartPulse;
+  if (slug.includes('economia')) return TrendingUp;
+  if (slug.includes('geo')) return Globe2;
+  if (slug.includes('noticias') || slug.includes('todas')) return Newspaper;
+  return FileText;
+}
+
 export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { articles: allArticles, getArticlesByCategory } = usePortalData();
+  const { articles: allArticles, categories, getArticlesByCategory } = usePortalData();
 
   const rawSlug = (slug || 'noticias').toLowerCase().trim();
 
-  const categoryMeta: Record<string, { title: string; desc: string; Icon: LucideIcon }> = {
-    agro: {
-      title: 'Agro & Agronegócios',
-      desc: 'Inteligência de safras, tecnologia de precisão, insumos e o dia a dia do produtor rural goiano.',
-      Icon: Sprout,
-    },
-    cidade: {
-      title: 'Cidade & Polos Regionais',
-      desc: 'Infraestrutura urbana, desenvolvimento regional e acontecimentos em Rio Verde, Jataí, Goiânia e Anápolis.',
-      Icon: Building,
-    },
-    politica: {
-      title: 'Política Estadual',
-      desc: 'Decisões do governo, legislação, políticas públicas e o impacto das medidas estaduais no setor produtivo.',
-      Icon: Landmark,
-    },
-    'saude-e-bem-estar': {
-      title: 'Saúde e Bem-Estar',
-      desc: 'Medicina preventiva, longevidade, qualidade de vida, avanços hospitalares e saúde ocupacional.',
-      Icon: HeartPulse,
-    },
-    economia: {
-      title: 'Economia & Negócios',
-      desc: 'Indicadores financeiros, cotações, investimentos industriais e crescimento econômico no Centro-Oeste.',
-      Icon: TrendingUp,
-    },
-    'geo-politica': {
-      title: 'Geo Política & Mercado Global',
-      desc: 'Relações internacionais, balança comercial, exportações para a Ásia e o posicionamento de Goiás no mundo.',
-      Icon: Globe2,
-    },
-    noticias: {
-      title: 'Todas as Notícias',
-      desc: 'Acompanhe a cobertura editorial completa do portal Conexões em FOCO.',
-      Icon: Newspaper,
-    },
-  };
+  // Busca dinâmica na tabela de categorias cadastradas no Admin
+  const dynamicCat = categories.find(
+    (c) =>
+      c.slug.toLowerCase() === rawSlug ||
+      c.id.toLowerCase() === rawSlug ||
+      c.name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-') === rawSlug
+  );
 
-  const currentMeta = categoryMeta[rawSlug] || {
-    title: `Editoria: ${rawSlug.toUpperCase()}`,
-    desc: 'Notícias e análises selecionadas pela equipe do Conexões em FOCO.',
-    Icon: FileText,
-  };
+  const currentMeta = useMemo(() => {
+    if (rawSlug === 'noticias' || rawSlug === 'todas') {
+      return {
+        title: 'Todas as Notícias',
+        desc: 'Acompanhe a cobertura editorial completa do portal Conexões em FOCO.',
+        Icon: Newspaper,
+      };
+    }
+    if (dynamicCat) {
+      return {
+        title: dynamicCat.name,
+        desc:
+          dynamicCat.description ||
+          `Cobertura completa e reportagens da editoria ${dynamicCat.name} no portal Conexões em FOCO.`,
+        Icon: getCategoryIconBySlug(dynamicCat.slug),
+      };
+    }
+    return {
+      title: rawSlug.replace(/-/g, ' ').toUpperCase(),
+      desc: 'Notícias e análises selecionadas pela equipe do Conexões em FOCO.',
+      Icon: getCategoryIconBySlug(rawSlug),
+    };
+  }, [rawSlug, dynamicCat]);
 
   const CurrentIcon = currentMeta.Icon;
 
@@ -112,7 +115,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => 
           </div>
         </div>
 
-        {/* ESPAÇO PUBLICITÁRIO DE CATEGORIA */}
+        {/* ESPAÇO PUBLICITÁRIO DE CATEGORIA (SÓ APARECE SE HOUVER BANNER CADASTRADO) */}
         <AdBanner type="leaderboard" onOpenAdModal={onOpenAdModal} className="mb-8" />
 
         {/* GRADE DE ARTIGOS */}
@@ -164,12 +167,12 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ onOpenAdModal }) => 
                   </div>
 
                   <div className="p-5 flex flex-col gap-2">
-                    {art.columnist && (
+                    {art.columnist?.name && (
                       <span className="text-[11px] text-indigo-900 font-bold">
                         Por {art.columnist.name}
                       </span>
                     )}
-                    {art.sponsor && (
+                    {art.sponsor?.name && (
                       <span className="text-[11px] text-amber-800 font-bold">
                         Patrocinado por {art.sponsor.name}
                       </span>

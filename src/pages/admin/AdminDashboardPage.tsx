@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
-  FileText,
   Megaphone,
   Users,
   Plus,
@@ -23,14 +22,13 @@ import {
   Loader2,
   ArrowLeft,
   Save,
-  TrendingUp,
   Newspaper,
-  Sparkles,
   ShieldCheck,
-  Clock,
   MapPin,
   ChevronRight,
   Layers,
+  Tag,
+  Camera,
 } from 'lucide-react';
 import { usePortalData } from '../../context/PortalDataContext';
 import {
@@ -39,6 +37,7 @@ import {
   MainCategory,
   EventItem,
   AdBannerRecord,
+  CategoryRecord,
 } from '../../types';
 import { RichTextEditor } from '../../components/admin/RichTextEditor';
 import { uploadMediaFile, supabase } from '../../lib/supabase';
@@ -46,6 +45,7 @@ import { uploadMediaFile, supabase } from '../../lib/supabase';
 type AdminTab =
   | 'dashboard'
   | 'materias'
+  | 'categorias'
   | 'conexao_empresarial'
   | 'conexao_lei'
   | 'agenda_eventos'
@@ -54,28 +54,52 @@ type AdminTab =
 
 type AdSubTab = 'leaderboard' | 'square';
 
-const CATEGORIES: MainCategory[] = [
-  'Agro',
-  'Cidade',
-  'Política',
-  'Saúde e Bem Estar',
-  'Economia',
-  'Geo Política',
-];
+const TAB_TO_SLUG: Record<AdminTab, string> = {
+  dashboard: 'visao-geral',
+  materias: 'materias',
+  categorias: 'categorias',
+  conexao_empresarial: 'conexao-empresarial',
+  conexao_lei: 'conexao-lei',
+  agenda_eventos: 'agenda-eventos',
+  anuncios: 'anuncios',
+  leads: 'leads',
+};
+
+const SLUG_TO_TAB: Record<string, AdminTab> = {
+  'visao-geral': 'dashboard',
+  dashboard: 'dashboard',
+  materias: 'materias',
+  categorias: 'categorias',
+  'conexao-empresarial': 'conexao_empresarial',
+  conexao_empresarial: 'conexao_empresarial',
+  'conexao-lei': 'conexao_lei',
+  conexao_lei: 'conexao_lei',
+  'agenda-eventos': 'agenda_eventos',
+  agenda_eventos: 'agenda_eventos',
+  anuncios: 'anuncios',
+  leads: 'leads',
+};
 
 export const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
+  const { tab: routeTab } = useParams<{ tab?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const {
     articles,
     events,
     banners,
     leads,
+    categories,
     mainFeaturedArticle,
     secondaryLeadArticles,
     saveArticle,
     deleteArticle,
     setMainLeadArticle,
     toggleSecondaryLeadArticle,
+    saveCategory,
+    deleteCategory,
+    toggleCategoryActive,
     saveEvent,
     deleteEvent,
     saveBanner,
@@ -85,7 +109,10 @@ export const AdminDashboardPage: React.FC = () => {
     deleteLead,
   } = usePortalData();
 
-  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const resolvedInitialTab: AdminTab =
+    (routeTab && SLUG_TO_TAB[routeTab.toLowerCase()]) || 'dashboard';
+
+  const [activeTab, setActiveTab] = useState<AdminTab>(resolvedInitialTab);
   const [adSubTab, setAdSubTab] = useState<AdSubTab>('leaderboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('todas');
@@ -103,11 +130,12 @@ export const AdminDashboardPage: React.FC = () => {
     id: '',
     title: '',
     subtitle: '',
-    category: 'Agro',
+    category: categories[0]?.name || 'Agro',
     contentType: 'materia',
     hubType: null,
     imageUrl: '',
     imageAlt: '',
+    imageCredit: '',
     publishedAt: 'Publicado hoje',
     readTime: '4 min de leitura',
     author: 'Redação Conexões',
@@ -118,6 +146,18 @@ export const AdminDashboardPage: React.FC = () => {
     highlightTag: '',
     sponsor: null,
     columnist: null,
+  });
+
+  // ESTADO DO MODAL DE CATEGORIA DINÂMICA
+  const [isEditingCategory, setIsEditingCategory] = useState(false);
+  const [categoryForm, setCategoryForm] = useState<CategoryRecord>({
+    id: '',
+    name: '',
+    slug: '',
+    color: '#006d3f',
+    description: '',
+    displayOrder: categories.length + 1,
+    isActive: true,
   });
 
   // ESTADO DO MODAL DE EVENTO
@@ -161,6 +201,40 @@ export const AdminDashboardPage: React.FC = () => {
     isActive: true,
   });
 
+  // Sincroniza aba com a URL dinâmica (/admin/:tab) e sobe para o topo ao trocar de página
+  useEffect(() => {
+    const nextTab = (routeTab && SLUG_TO_TAB[routeTab.toLowerCase()]) || 'dashboard';
+    setActiveTab(nextTab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [routeTab]);
+
+  // Se houver ?editar=<id> na URL ao atualizar a página, restaura o editor da matéria
+  useEffect(() => {
+    const editId = searchParams.get('editar');
+    if (editId && articles.length > 0 && !isEditingArticle) {
+      const found = articles.find((a) => a.id === editId);
+      if (found) {
+        const html =
+          found.contentHtml ||
+          (found.content || []).map((p) => `<p>${p}</p>`).join('') ||
+          '<p></p>';
+        setArticleForm({
+          ...found,
+          imageCredit: found.imageCredit || '',
+          contentHtml: html,
+        });
+        setIsEditingArticle(true);
+      }
+    }
+  }, [searchParams, articles, isEditingArticle]);
+
+  const selectAdminTab = (nextTab: AdminTab) => {
+    setIsEditingArticle(false);
+    setActiveTab(nextTab);
+    navigate(`/admin/${TAB_TO_SLUG[nextTab]}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Verifica sessão de administrador
   useEffect(() => {
     const checkAuth = async () => {
@@ -190,12 +264,14 @@ export const AdminDashboardPage: React.FC = () => {
     contentType?: ContentType;
     hubType?: 'empresarial' | 'lei' | null;
     category?: MainCategory;
+    isMainLead?: boolean;
   }) => {
     const cType = preset?.contentType || 'materia';
     const hType = preset?.hubType !== undefined ? preset.hubType : null;
+    const defaultCat = categories[0]?.name || 'Agro';
     const cat =
       preset?.category ||
-      (hType === 'empresarial' ? 'Economia' : hType === 'lei' ? 'Política' : 'Agro');
+      (hType === 'empresarial' ? 'Economia' : hType === 'lei' ? 'Política' : defaultCat);
 
     setArticleForm({
       id: '',
@@ -204,9 +280,9 @@ export const AdminDashboardPage: React.FC = () => {
       category: cat,
       contentType: cType,
       hubType: hType,
-      imageUrl:
-        'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1400&q=80',
+      imageUrl: '',
       imageAlt: '',
+      imageCredit: '',
       publishedAt: `Hoje às ${new Date().toLocaleTimeString('pt-BR', {
         hour: '2-digit',
         minute: '2-digit',
@@ -214,8 +290,8 @@ export const AdminDashboardPage: React.FC = () => {
       readTime: '4 min de leitura',
       author: hType === 'lei' ? 'Colunista Jurídico' : 'Redação Conexões em FOCO',
       content: [],
-      contentHtml: '<p>Comece a digitar o texto completo aqui...</p>',
-      isMainLead: false,
+      contentHtml: '<p></p>',
+      isMainLead: Boolean(preset?.isMainLead),
       isSecondaryLead: false,
       highlightTag: '',
       sponsor:
@@ -230,14 +306,14 @@ export const AdminDashboardPage: React.FC = () => {
         cType === 'artigo' || hType === 'lei'
           ? {
               name: '',
-              avatarUrl:
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+              avatarUrl: '',
               role: hType === 'lei' ? 'Advogado(a) Especialista' : 'Especialista Convidado',
               bio: '',
             }
           : null,
     });
     setIsEditingArticle(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const openEditArticleEditor = (art: Article) => {
@@ -247,6 +323,7 @@ export const AdminDashboardPage: React.FC = () => {
       '<p></p>';
     setArticleForm({
       ...art,
+      imageCredit: art.imageCredit || '',
       contentHtml: html,
       sponsor: art.sponsor || {
         name: '',
@@ -255,13 +332,20 @@ export const AdminDashboardPage: React.FC = () => {
       },
       columnist: art.columnist || {
         name: art.author || '',
-        avatarUrl:
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        avatarUrl: '',
         role: 'Especialista / Colunista',
         bio: '',
       },
     });
     setIsEditingArticle(true);
+    setSearchParams({ editar: art.id });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const closeArticleEditor = () => {
+    setIsEditingArticle(false);
+    setSearchParams({});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleUploadCoverImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -341,11 +425,45 @@ export const AdminDashboardPage: React.FC = () => {
       };
 
       await saveArticle(payload);
-      setIsEditingArticle(false);
+      closeArticleEditor();
       showToast('Publicação salva e publicada no portal com sucesso!');
     } catch (err) {
       console.error(err);
       alert('Erro ao salvar publicação no banco de dados.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // SALVAR CATEGORIA / EDITORIA
+  const handleSaveCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!categoryForm.name.trim()) {
+      alert('Informe o nome da categoria/editoria.');
+      return;
+    }
+    try {
+      setSaving(true);
+      const slug =
+        categoryForm.slug.trim() ||
+        categoryForm.name
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+      const id = categoryForm.id.trim() || slug || `cat-${Date.now()}`;
+      await saveCategory({
+        ...categoryForm,
+        id,
+        name: categoryForm.name.trim(),
+        slug,
+      });
+      setIsEditingCategory(false);
+      showToast('Categoria salva e sincronizada em todo o portal!');
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao salvar categoria.');
     } finally {
       setSaving(false);
     }
@@ -411,6 +529,8 @@ export const AdminDashboardPage: React.FC = () => {
         return 'Mesa de Redação & Visão Geral';
       case 'materias':
         return 'Matérias, Artigos & Editorias';
+      case 'categorias':
+        return 'Gestão de Categorias & Editorias do Site';
       case 'conexao_empresarial':
         return 'Conexão Empresarial • Hub B2B';
       case 'conexao_lei':
@@ -463,10 +583,7 @@ export const AdminDashboardPage: React.FC = () => {
               <div className="space-y-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTab('dashboard');
-                    setIsEditingArticle(false);
-                  }}
+                  onClick={() => selectAdminTab('dashboard')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'dashboard' && !isEditingArticle
                       ? 'bg-gradient-to-r from-[#006d3f] to-[#00884f] text-white shadow-md shadow-emerald-950/50 font-bold'
@@ -481,10 +598,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTab('materias');
-                    setIsEditingArticle(false);
-                  }}
+                  onClick={() => selectAdminTab('materias')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'materias' && !isEditingArticle
                       ? 'bg-gradient-to-r from-[#006d3f] to-[#00884f] text-white shadow-md shadow-emerald-950/50 font-bold'
@@ -493,10 +607,28 @@ export const AdminDashboardPage: React.FC = () => {
                 >
                   <span className="flex items-center gap-3">
                     <Newspaper className="w-4 h-4 shrink-0" />
-                    <span>Matérias & Editorias</span>
+                    <span>Matérias & Publicações</span>
                   </span>
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-200">
                     {articles.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => selectAdminTab('categorias')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    activeTab === 'categorias' && !isEditingArticle
+                      ? 'bg-gradient-to-r from-[#006d3f] to-[#00884f] text-white shadow-md shadow-emerald-950/50 font-bold'
+                      : 'text-slate-300 hover:bg-white/[0.05] hover:text-white'
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    <Tag className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Categorias & Editorias</span>
+                  </span>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-200">
+                    {categories.length}
                   </span>
                 </button>
               </div>
@@ -510,10 +642,7 @@ export const AdminDashboardPage: React.FC = () => {
               <div className="space-y-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTab('conexao_empresarial');
-                    setIsEditingArticle(false);
-                  }}
+                  onClick={() => selectAdminTab('conexao_empresarial')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'conexao_empresarial' && !isEditingArticle
                       ? 'bg-gradient-to-r from-[#006d3f] to-[#00884f] text-white shadow-md font-bold'
@@ -531,10 +660,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTab('conexao_lei');
-                    setIsEditingArticle(false);
-                  }}
+                  onClick={() => selectAdminTab('conexao_lei')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'conexao_lei' && !isEditingArticle
                       ? 'bg-gradient-to-r from-[#006d3f] to-[#00884f] text-white shadow-md font-bold'
@@ -552,10 +678,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTab('agenda_eventos');
-                    setIsEditingArticle(false);
-                  }}
+                  onClick={() => selectAdminTab('agenda_eventos')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'agenda_eventos' && !isEditingArticle
                       ? 'bg-gradient-to-r from-[#006d3f] to-[#00884f] text-white shadow-md font-bold'
@@ -581,10 +704,7 @@ export const AdminDashboardPage: React.FC = () => {
               <div className="space-y-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTab('anuncios');
-                    setIsEditingArticle(false);
-                  }}
+                  onClick={() => selectAdminTab('anuncios')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'anuncios' && !isEditingArticle
                       ? 'bg-gradient-to-r from-[#006d3f] to-[#00884f] text-white shadow-md font-bold'
@@ -602,10 +722,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTab('leads');
-                    setIsEditingArticle(false);
-                  }}
+                  onClick={() => selectAdminTab('leads')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'leads' && !isEditingArticle
                       ? 'bg-gradient-to-r from-[#006d3f] to-[#00884f] text-white shadow-md font-bold'
@@ -708,7 +825,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => setIsEditingArticle(false)}
+                    onClick={() => closeArticleEditor()}
                     className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
                   >
                     <ArrowLeft className="w-5 h-5" />
@@ -726,7 +843,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => setIsEditingArticle(false)}
+                    onClick={() => closeArticleEditor()}
                     className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
                   >
                     Voltar
@@ -772,7 +889,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                   <div>
                     <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">
-                      Editoria Oficial (6 Categorias)
+                      Editoria / Categoria ({categories.length} cadastradas)
                     </label>
                     <select
                       value={articleForm.category}
@@ -781,9 +898,9 @@ export const AdminDashboardPage: React.FC = () => {
                       }
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-[#006d3f]"
                     >
-                      {CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.name}>
+                          {cat.name}
                         </option>
                       ))}
                     </select>
@@ -882,20 +999,42 @@ export const AdminDashboardPage: React.FC = () => {
                       </button>
                     </div>
 
-                    <input
-                      type="text"
-                      value={articleForm.imageAlt || ''}
-                      onChange={(e) =>
-                        setArticleForm((prev) => ({ ...prev, imageAlt: e.target.value }))
-                      }
-                      placeholder="Legenda/crédito da foto de capa (Ex: Safra em Rio Verde - Foto: Divulgação)"
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-xs"
-                    />
+                    {/* LEGENDA E AUTOR DA FOTO DE CAPA (IGUAL ÀS FOTOS DO CORPO DA MATÉRIA) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                          Legenda da Foto de Capa
+                        </label>
+                        <input
+                          type="text"
+                          value={articleForm.imageAlt || ''}
+                          onChange={(e) =>
+                            setArticleForm((prev) => ({ ...prev, imageAlt: e.target.value }))
+                          }
+                          placeholder="Ex: Colheita de soja em Rio Verde (GO)"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#006d3f] mb-1">
+                          📸 Autor / Crédito da Foto de Capa
+                        </label>
+                        <input
+                          type="text"
+                          value={articleForm.imageCredit || ''}
+                          onChange={(e) =>
+                            setArticleForm((prev) => ({ ...prev, imageCredit: e.target.value }))
+                          }
+                          placeholder="Ex: João Silva / Assessoria COMIGO"
+                          className="w-full px-3.5 py-2 rounded-xl border border-emerald-300 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#006d3f]"
+                        />
+                      </div>
+                    </div>
 
                     <div className="grid grid-cols-2 gap-3 pt-1">
                       <div>
                         <label className="block text-[11px] font-bold text-slate-600 mb-1">
-                          Autor / Assinatura
+                          Autor da Matéria / Assinatura
                         </label>
                         <input
                           type="text"
@@ -1171,7 +1310,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                   <button
                     type="button"
-                    onClick={() => setIsEditingArticle(false)}
+                    onClick={() => closeArticleEditor()}
                     className="px-5 py-3 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
                   >
                     Cancelar
@@ -1195,8 +1334,8 @@ export const AdminDashboardPage: React.FC = () => {
                   {/* KPI CARDS */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     <div
-                      onClick={() => setActiveTab('materias')}
-                      className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+                      onClick={() => selectAdminTab('materias')}
+                      className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
@@ -1210,14 +1349,14 @@ export const AdminDashboardPage: React.FC = () => {
                         {articles.length}
                       </div>
                       <div className="text-xs text-[#006d3f] font-semibold mt-1 flex items-center gap-1">
-                        <span>6 Editorias Oficiais</span>
+                        <span>{categories.length} Editorias Ativas</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </div>
                     </div>
 
                     <div
-                      onClick={() => setActiveTab('conexao_empresarial')}
-                      className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+                      onClick={() => selectAdminTab('conexao_empresarial')}
+                      className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
@@ -1237,8 +1376,8 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
 
                     <div
-                      onClick={() => setActiveTab('anuncios')}
-                      className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+                      onClick={() => selectAdminTab('anuncios')}
+                      className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
@@ -1257,8 +1396,8 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
 
                     <div
-                      onClick={() => setActiveTab('leads')}
-                      className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+                      onClick={() => selectAdminTab('leads')}
+                      className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
@@ -1276,7 +1415,7 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
 
                   {/* MESA DE REDAÇÃO DA CAPA (HERO) */}
-                  <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-2xs space-y-5">
+                  <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                       <div>
                         <div className="flex items-center gap-2">
@@ -1290,109 +1429,131 @@ export const AdminDashboardPage: React.FC = () => {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500">
-                          Trocar Manchete:
-                        </span>
-                        <select
-                          aria-label="Selecionar Manchete Principal"
-                          value={mainFeaturedArticle?.id || ''}
-                          onChange={async (e) => {
-                            if (e.target.value) {
-                              await setMainLeadArticle(e.target.value);
-                              showToast('Manchete Principal da Capa atualizada!');
-                            }
-                          }}
-                          className="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs font-bold text-slate-800 max-w-xs truncate"
-                        >
-                          {articles.map((a) => (
-                            <option key={a.id} value={a.id}>
-                              [{a.category}] {a.title.slice(0, 52)}...
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      {mainFeaturedArticle && (
-                        <div className="lg:col-span-7 bg-gradient-to-br from-[#08111D] via-[#0E1B2B] to-[#162B42] text-white rounded-2xl p-5 flex flex-col sm:flex-row gap-5 items-center shadow-md">
-                          <img
-                            src={mainFeaturedArticle.imageUrl}
-                            alt={mainFeaturedArticle.title}
-                            className="w-full sm:w-48 h-36 object-cover rounded-xl shrink-0 border border-white/10"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="px-2.5 py-0.5 rounded-md bg-[#23B26D] text-white text-[10px] font-extrabold uppercase">
-                                Manchete Principal
-                              </span>
-                              <span className="text-[11px] text-[#7afbae] font-bold">
-                                {mainFeaturedArticle.category}
-                              </span>
-                            </div>
-                            <h3 className="text-base font-extrabold leading-snug mb-1.5 line-clamp-2">
-                              {mainFeaturedArticle.title}
-                            </h3>
-                            <p className="text-xs text-slate-300 line-clamp-2 mb-3">
-                              {mainFeaturedArticle.subtitle}
-                            </p>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => openEditArticleEditor(mainFeaturedArticle)}
-                                className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" />
-                                <span>Editar no Editor Word</span>
-                              </button>
-                              <Link
-                                to={`/materia/${mainFeaturedArticle.id}`}
-                                target="_blank"
-                                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-slate-300"
-                              >
-                                Ver no Site ↗
-                              </Link>
-                            </div>
-                          </div>
+                      {articles.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-500">
+                            Trocar Manchete:
+                          </span>
+                          <select
+                            aria-label="Selecionar Manchete Principal"
+                            value={mainFeaturedArticle?.id || ''}
+                            onChange={async (e) => {
+                              if (e.target.value) {
+                                await setMainLeadArticle(e.target.value);
+                                showToast('Manchete Principal da Capa atualizada!');
+                              }
+                            }}
+                            className="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs font-bold text-slate-800 max-w-xs truncate"
+                          >
+                            {articles.map((a) => (
+                              <option key={a.id} value={a.id}>
+                                [{a.category}] {a.title.slice(0, 52)}...
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       )}
+                    </div>
 
-                      <div className="lg:col-span-5 flex flex-col justify-between space-y-3">
-                        <div className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
-                          Destaques Secundários da Capa (Coluna Lateral)
+                    {articles.length === 0 ? (
+                      <div className="py-10 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-3">
+                        <Newspaper className="w-8 h-8 text-[#006d3f] mx-auto" />
+                        <div className="text-sm font-extrabold text-slate-800">
+                          O portal está limpo e pronto para receber a primeira matéria!
                         </div>
-                        {secondaryLeadArticles.map((sec) => (
-                          <div
-                            key={sec.id}
-                            className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3"
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              <img
-                                src={sec.imageUrl}
-                                alt={sec.title}
-                                className="w-14 h-12 rounded-lg object-cover shrink-0"
-                              />
-                              <div className="min-w-0">
-                                <span className="text-[10px] font-extrabold uppercase text-[#006d3f]">
-                                  {sec.category}
+                        <p className="text-xs text-slate-500 max-w-md mx-auto">
+                          Clique no botão abaixo para abrir o Editor Estilo Word e publicar a primeira manchete oficial do Conexões em FOCO.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => openNewArticleEditor({ isMainLead: true })}
+                          className="px-5 py-2.5 rounded-xl bg-[#006d3f] hover:bg-[#00522e] text-white text-xs font-extrabold uppercase tracking-wider inline-flex items-center gap-2 cursor-pointer"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Publicar Primeira Matéria</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        {mainFeaturedArticle && (
+                          <div className="lg:col-span-7 bg-gradient-to-br from-[#08111D] via-[#0E1B2B] to-[#162B42] text-white rounded-2xl p-5 flex flex-col sm:flex-row gap-5 items-center shadow-md">
+                            <img
+                              src={mainFeaturedArticle.imageUrl}
+                              alt={mainFeaturedArticle.title}
+                              className="w-full sm:w-48 h-36 object-cover rounded-xl shrink-0 border border-white/10"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="px-2.5 py-0.5 rounded-md bg-[#23B26D] text-white text-[10px] font-extrabold uppercase">
+                                  Manchete Principal
                                 </span>
-                                <h4 className="text-xs font-bold text-slate-900 truncate">
-                                  {sec.title}
-                                </h4>
+                                <span className="text-[11px] text-[#7afbae] font-bold">
+                                  {mainFeaturedArticle.category}
+                                </span>
+                              </div>
+                              <h3 className="text-base font-extrabold leading-snug mb-1.5 line-clamp-2">
+                                {mainFeaturedArticle.title}
+                              </h3>
+                              <p className="text-xs text-slate-300 line-clamp-2 mb-3">
+                                {mainFeaturedArticle.subtitle}
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => openEditArticleEditor(mainFeaturedArticle)}
+                                  className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                  <span>Editar no Editor Word</span>
+                                </button>
+                                <Link
+                                  to={`/materia/${mainFeaturedArticle.id}`}
+                                  target="_blank"
+                                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-slate-300"
+                                >
+                                  Ver no Site ↗
+                                </Link>
                               </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => openEditArticleEditor(sec)}
-                              className="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-700 shrink-0 cursor-pointer"
-                            >
-                              Editar
-                            </button>
                           </div>
-                        ))}
+                        )}
+
+                        <div className="lg:col-span-5 flex flex-col justify-between space-y-3">
+                          <div className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                            Destaques Secundários da Capa (Coluna Lateral)
+                          </div>
+                          {secondaryLeadArticles.map((sec) => (
+                            <div
+                              key={sec.id}
+                              className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3"
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <img
+                                  src={sec.imageUrl}
+                                  alt={sec.title}
+                                  className="w-14 h-12 rounded-lg object-cover shrink-0"
+                                />
+                                <div className="min-w-0">
+                                  <span className="text-[10px] font-extrabold uppercase text-[#006d3f]">
+                                    {sec.category}
+                                  </span>
+                                  <h4 className="text-xs font-bold text-slate-900 truncate">
+                                    {sec.title}
+                                  </h4>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => openEditArticleEditor(sec)}
+                                className="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-700 shrink-0 cursor-pointer"
+                              >
+                                Editar
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* ATALHOS RÁPIDOS DOS 3 AMBIENTES CONEXÕES */}
@@ -1417,7 +1578,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => setActiveTab('conexao_empresarial')}
+                          onClick={() => selectAdminTab('conexao_empresarial')}
                           className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer"
                         >
                           Gerenciar
@@ -1458,7 +1619,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => setActiveTab('conexao_lei')}
+                          onClick={() => selectAdminTab('conexao_lei')}
                           className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer"
                         >
                           Gerenciar
@@ -1499,7 +1660,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => setActiveTab('agenda_eventos')}
+                          onClick={() => selectAdminTab('agenda_eventos')}
                           className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer"
                         >
                           Ver Agenda
@@ -1507,7 +1668,7 @@ export const AdminDashboardPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            setActiveTab('agenda_eventos');
+                            selectAdminTab('agenda_eventos');
                             setIsEditingEvent(true);
                           }}
                           className="px-3.5 py-2 rounded-xl bg-[#004E86] text-white text-xs font-bold cursor-pointer"
@@ -1520,11 +1681,262 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               )}
 
+              {/* ABA CATEGORIAS & EDITORIAS */}
+              {activeTab === 'categorias' && (
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-[#08111D] via-[#0E1B2B] to-[#004E30] text-white rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#7afbae] bg-white/10 px-2.5 py-0.5 rounded-full">
+                        Menu Principal & Filtros Dinâmicos
+                      </span>
+                      <h2 className="text-xl font-extrabold mt-2">
+                        Categorias & Editorias do Site ({categories.length})
+                      </h2>
+                      <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                        As categorias cadastradas aqui aparecem automaticamente no menu superior do site, no rodapé, nos filtros e no Editor de Matérias.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCategoryForm({
+                          id: '',
+                          name: '',
+                          slug: '',
+                          color: '#006d3f',
+                          description: '',
+                          displayOrder: categories.length + 1,
+                          isActive: true,
+                        });
+                        setIsEditingCategory(true);
+                      }}
+                      className="px-5 py-3 rounded-xl bg-[#23B26D] hover:bg-[#1ca05f] text-slate-950 text-xs font-extrabold uppercase tracking-wider flex items-center gap-2 shrink-0 cursor-pointer shadow-lg"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Nova Categoria</span>
+                    </button>
+                  </div>
+
+                  {isEditingCategory && (
+                    <form
+                      onSubmit={handleSaveCategorySubmit}
+                      className="bg-white rounded-3xl p-6 border border-emerald-200 shadow-sm space-y-5"
+                    >
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 className="text-base font-extrabold text-slate-900">
+                          {categoryForm.id ? 'Editar Categoria' : 'Cadastrar Nova Categoria / Editoria'}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingCategory(false)}
+                          className="text-xs font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
+                        >
+                          Fechar ✕
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-1">
+                            Nome da Categoria / Editoria *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={categoryForm.name}
+                            onChange={(e) => {
+                              const name = e.target.value;
+                              const autoSlug = name
+                                .toLowerCase()
+                                .normalize('NFD')
+                                .replace(/[\u0300-\u036f]/g, '')
+                                .replace(/[^a-z0-9]+/g, '-')
+                                .replace(/(^-|-$)/g, '');
+                              setCategoryForm((prev) => ({
+                                ...prev,
+                                name,
+                                slug: prev.id ? prev.slug : autoSlug,
+                              }));
+                            }}
+                            placeholder="Ex: Tecnologia no Campo, Esportes, Cultura..."
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-1">
+                            Slug (Link da URL)
+                          </label>
+                          <input
+                            type="text"
+                            value={categoryForm.slug}
+                            onChange={(e) =>
+                              setCategoryForm((prev) => ({ ...prev, slug: e.target.value }))
+                            }
+                            placeholder="Ex: tecnologia-no-campo"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-600"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-1">
+                            Ordem no Menu
+                          </label>
+                          <input
+                            type="number"
+                            value={categoryForm.displayOrder}
+                            onChange={(e) =>
+                              setCategoryForm((prev) => ({
+                                ...prev,
+                                displayOrder: Number(e.target.value) || 1,
+                              }))
+                            }
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                        <div className="md:col-span-2">
+                          <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-1">
+                            Descrição Editorial da Categoria
+                          </label>
+                          <input
+                            type="text"
+                            value={categoryForm.description || ''}
+                            onChange={(e) =>
+                              setCategoryForm((prev) => ({
+                                ...prev,
+                                description: e.target.value,
+                              }))
+                            }
+                            placeholder="Breve descrição que aparece no topo da página da editoria..."
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs"
+                          />
+                        </div>
+
+                        <div className="pt-4">
+                          <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={categoryForm.isActive}
+                              onChange={(e) =>
+                                setCategoryForm((prev) => ({
+                                  ...prev,
+                                  isActive: e.target.checked,
+                                }))
+                              }
+                              className="w-4 h-4 accent-[#006d3f]"
+                            />
+                            <span>Exibir categoria ativa no menu do site</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingCategory(false)}
+                          className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 cursor-pointer"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={saving}
+                          className="px-6 py-2.5 rounded-xl bg-[#006d3f] hover:bg-[#00522e] text-white text-xs font-extrabold uppercase tracking-wider cursor-pointer"
+                        >
+                          {saving ? 'Salvando...' : 'Salvar Categoria'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {categories.map((cat) => {
+                      const count = articles.filter(
+                        (a) => a.category.toLowerCase() === cat.name.toLowerCase()
+                      ).length;
+                      return (
+                        <div
+                          key={cat.id}
+                          className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between gap-4"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2">
+                              <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-[#006d3f] text-[10px] font-extrabold uppercase">
+                                Ordem #{cat.displayOrder}
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  cat.isActive
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-slate-100 text-slate-500'
+                                }`}
+                              >
+                                {cat.isActive ? 'Ativa no Menu' : 'Oculta'}
+                              </span>
+                            </div>
+                            <h3 className="text-base font-extrabold text-slate-900">
+                              {cat.name}
+                            </h3>
+                            <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                              /editoria/{cat.slug}
+                            </p>
+                            {cat.description && (
+                              <p className="text-xs text-slate-500 mt-2 line-clamp-2">
+                                {cat.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                            <span className="text-xs font-bold text-slate-500">
+                              {count} {count === 1 ? 'matéria' : 'matérias'}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCategoryForm(cat);
+                                  setIsEditingCategory(true);
+                                }}
+                                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>Editar</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  if (
+                                    window.confirm(
+                                      `Deseja realmente remover a categoria "${cat.name}"?`
+                                    )
+                                  ) {
+                                    await deleteCategory(cat.id);
+                                    showToast('Categoria removida com sucesso.');
+                                  }
+                                }}
+                                className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 cursor-pointer"
+                                title="Excluir Categoria"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* ABA 2: MATÉRIAS & EDITORIAS */}
               {activeTab === 'materias' && (
                 <div className="space-y-6">
                   {/* BARRA DE BUSCA E PÍLULAS DE EDITORIAS */}
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+                  <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                       <div className="relative flex-1 w-full">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -1547,7 +1959,7 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                      {['todas', ...CATEGORIES].map((cat) => (
+                      {['todas', ...categories.map((c) => c.name)].map((cat) => (
                         <button
                           key={cat}
                           type="button"

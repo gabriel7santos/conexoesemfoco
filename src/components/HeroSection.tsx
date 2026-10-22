@@ -3,7 +3,7 @@ import { Sprout, Clock, BookOpen, ArrowRight } from 'lucide-react';
 import { Article } from '../types';
 
 interface HeroSectionProps {
-  mainArticle: Article;
+  mainArticle: Article | null;
   secondaryArticles: Article[];
   onArticleClick: (article: Article) => void;
 }
@@ -13,13 +13,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   secondaryArticles,
   onArticleClick,
 }) => {
+  if (!mainArticle) return null;
+
   return (
     <section className="w-full bg-[#0f1c2c] text-white rounded-xl shadow-xl p-5 md:p-6 mb-8 relative overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* COLUNA ESQUERDA: Manchete Principal de Capa */}
         <article
           onClick={() => onArticleClick(mainArticle)}
-          className="lg:col-span-8 flex flex-col group relative rounded-xl overflow-hidden min-h-[460px] lg:min-h-[540px] justify-end p-6 md:p-8 shadow-lg cursor-pointer"
+          className={`${
+            secondaryArticles.length > 0 ? 'lg:col-span-8' : 'lg:col-span-12'
+          } flex flex-col group relative rounded-xl overflow-hidden min-h-[460px] lg:min-h-[540px] justify-end p-6 md:p-8 shadow-lg cursor-pointer`}
         >
           <img
             src={mainArticle.imageUrl}
@@ -77,44 +81,46 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </article>
 
         {/* COLUNA DIREITA: Matérias Secundárias Empilhadas */}
-        <aside className="lg:col-span-4 flex flex-col gap-4 justify-between h-full">
-          {secondaryArticles.map((article) => (
-            <article
-              key={article.id}
-              onClick={() => onArticleClick(article)}
-              className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col justify-between group cursor-pointer hover:bg-white/10 transition-all flex-1"
-            >
-              <div className="relative rounded-lg overflow-hidden h-36 w-full mb-3 bg-black/20">
-                <img
-                  src={article.imageUrl}
-                  alt={article.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <span
-                  className={`absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded text-[11px] uppercase tracking-wider font-bold ${
-                    article.category === 'ECONOMIA'
-                      ? 'bg-[#001d32]/90 text-[#cde5ff]'
-                      : 'bg-[#006d3f]/90 text-white'
-                  }`}
-                >
-                  {article.category}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <h2 className="text-base font-bold text-white group-hover:text-[#7afbae] transition-colors line-clamp-2 leading-snug">
-                  {article.title}
-                </h2>
-                <div className="flex items-center gap-2 text-gray-400 text-xs mt-1">
-                  <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                  <span>
-                    {article.publishedAt} • {article.author}
+        {secondaryArticles.length > 0 && (
+          <aside className="lg:col-span-4 flex flex-col gap-4 justify-between h-full">
+            {secondaryArticles.map((article) => (
+              <article
+                key={article.id}
+                onClick={() => onArticleClick(article)}
+                className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col justify-between group cursor-pointer hover:bg-white/10 transition-all flex-1"
+              >
+                <div className="relative rounded-lg overflow-hidden h-36 w-full mb-3 bg-black/20">
+                  <img
+                    src={article.imageUrl}
+                    alt={article.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span
+                    className={`absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded text-[11px] uppercase tracking-wider font-bold ${
+                      article.category.toUpperCase() === 'ECONOMIA'
+                        ? 'bg-[#001d32]/90 text-[#cde5ff]'
+                        : 'bg-[#006d3f]/90 text-white'
+                    }`}
+                  >
+                    {article.category}
                   </span>
                 </div>
-              </div>
-            </article>
-          ))}
-        </aside>
+
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-base font-bold text-white group-hover:text-[#7afbae] transition-colors line-clamp-2 leading-snug">
+                    {article.title}
+                  </h2>
+                  <div className="flex items-center gap-2 text-gray-400 text-xs mt-1">
+                    <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <span>
+                      {article.publishedAt} • {article.author}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </aside>
+        )}
       </div>
     </section>
   );

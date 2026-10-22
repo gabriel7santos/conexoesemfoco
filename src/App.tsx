@@ -148,6 +148,7 @@ export const App: React.FC = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/:tab" element={<AdminDashboardPage />} />
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/*" element={<MainLayout />} />
         </Routes>

@@ -34,7 +34,10 @@ const DefaultConexoesLogo: React.FC<{ className?: string }> = ({ className = 'h-
   />
 );
 
-export function resolveLogoComponent(logoKey?: string, logoUrl?: string): React.FC<{ className?: string }> {
+export function resolveLogoComponent(
+  logoKey?: string,
+  logoUrl?: string
+): React.FC<{ className?: string }> {
   if (logoUrl && logoUrl.trim()) {
     return ({ className = 'h-8' }) => (
       <img src={logoUrl} alt="Logo" className={`${className} w-auto object-contain`} />
@@ -58,86 +61,7 @@ export function resolveLogoComponent(logoKey?: string, logoUrl?: string): React.
   }
 }
 
-export const mockSquareAds: SquareAdItem[] = [
-  {
-    id: 'sq-comigo',
-    brandName: 'COMIGO Cooperativa',
-    tag: 'PATROCÍNIO OFICIAL',
-    headline: 'Safra 2026/2027 com Alta Produtividade',
-    description: 'Armazenagem moderna, insumos e assistência técnica agronômica no Sudoeste Goiano.',
-    ctaText: 'Conhecer Soluções',
-    ctaColor: 'bg-[#23B26D] hover:bg-[#1fa162]',
-    gradientBg: 'from-[#002f1a] via-[#004e28] to-[#041a0f]',
-    borderColor: 'border-[#23B26D]/40 hover:border-[#7afbae]',
-    bgImage: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=600&q=80',
-    LogoComponent: ComigoLogo,
-  },
-  {
-    id: 'sq-sicoob',
-    brandName: 'SICOOB Credi-Rural',
-    tag: 'PARCEIRO MASTER',
-    headline: 'Crédito Ágil para Maquinários & Safra',
-    description: 'Linhas de financiamento com taxas competitivas e energia solar para o produtor rural.',
-    ctaText: 'Simular Financiamento',
-    ctaColor: 'bg-[#00AE9D] hover:bg-[#008f80]',
-    gradientBg: 'from-[#00262c] via-[#003c46] to-[#00171b]',
-    borderColor: 'border-teal-500/40 hover:border-teal-300',
-    bgImage: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80',
-    LogoComponent: SicoobLogo,
-  },
-  {
-    id: 'sq-autorio',
-    brandName: 'Autorio Chevrolet',
-    tag: 'CONDIÇÕES PRODUTOR RURAL',
-    headline: 'Nova Chevrolet S10 & Silverado 4x4',
-    description: 'Bônus de fábrica, taxa reduzida e pronta entrega com desconto para CNPJ e Produtor.',
-    ctaText: 'Ver Condições',
-    ctaColor: 'bg-[#D99B26] hover:bg-[#b8801b] text-black font-black',
-    gradientBg: 'from-[#0c1626] via-[#12233c] to-[#080e18]',
-    borderColor: 'border-amber-500/40 hover:border-amber-300',
-    bgImage: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80',
-    LogoComponent: AutorioLogo,
-  },
-  {
-    id: 'sq-johndeere',
-    brandName: 'John Deere Máquinas',
-    tag: 'TECNOLOGIA DE CAMPO',
-    headline: 'Colheita Conectada com Piloto Automático',
-    description: 'Telemetria em tempo real e colheitadeiras autônomas para maximizar o rendimento.',
-    ctaText: 'Ver Máquinas',
-    ctaColor: 'bg-[#367C2B] hover:bg-[#2a6222]',
-    gradientBg: 'from-[#142e0f] via-[#1f4818] to-[#0a1807]',
-    borderColor: 'border-yellow-500/40 hover:border-yellow-300',
-    bgImage: 'https://images.unsplash.com/photo-1589876527581-2a626a575bb6?auto=format&fit=crop&w=600&q=80',
-    LogoComponent: JohnDeereLogo,
-  },
-  {
-    id: 'sq-solutec',
-    brandName: 'Solutec Agro',
-    tag: 'AGRICULTURA DE PRECISÃO',
-    headline: 'Monitoramento & Sensores por IA',
-    description: 'Mapeamento aéreo e diagnóstico nutricional de lavouras em Rio Verde e Jataí.',
-    ctaText: 'Agendar Teste',
-    ctaColor: 'bg-[#0284C7] hover:bg-[#0369a1]',
-    gradientBg: 'from-[#041a28] via-[#072d46] to-[#020e17]',
-    borderColor: 'border-sky-500/40 hover:border-sky-300',
-    bgImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
-    LogoComponent: SolutecLogo,
-  },
-  {
-    id: 'sq-ocb',
-    brandName: 'Sistema OCB/GO',
-    tag: 'SOMOSCOOP GOIÁS',
-    headline: 'O Cooperativismo que Move Nosso Estado',
-    description: 'Mais de 250 cooperativas goianas gerando emprego, renda e desenvolvimento sustentável.',
-    ctaText: 'Conhecer Projetos',
-    ctaColor: 'bg-[#005A36] hover:bg-[#004227]',
-    gradientBg: 'from-[#002e1c] via-[#00472b] to-[#00170e]',
-    borderColor: 'border-emerald-500/40 hover:border-emerald-300',
-    bgImage: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=600&q=80',
-    LogoComponent: OcbGoLogo,
-  },
-];
+export const mockSquareAds: SquareAdItem[] = [];
 
 interface SquareBannerProps {
   ad?: SquareAdItem;
@@ -175,32 +99,36 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
       LogoComponent: resolveLogoComponent(b.logoKey, b.logoUrl),
     }));
 
-  const pool = dbSquareBanners.length > 0 ? dbSquareBanners : mockSquareAds;
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (!autoRotate) return;
+    if (!autoRotate || dbSquareBanners.length <= 1) return;
     const timer = setInterval(() => {
       if (!isPaused) {
-        setCurrentIndex((prev) => (prev + 1) % pool.length);
+        setCurrentIndex((prev) => (prev + 1) % dbSquareBanners.length);
       }
     }, intervalMs);
     return () => clearInterval(timer);
-  }, [autoRotate, isPaused, intervalMs, pool.length]);
+  }, [autoRotate, isPaused, intervalMs, dbSquareBanners.length]);
 
-  const activeAd = ad || pool[currentIndex % pool.length] || mockSquareAds[0];
+  const activeAd = ad || dbSquareBanners[currentIndex % dbSquareBanners.length];
+
+  // Quando não houver patrocinador quadrado cadastrado, não exibir nada
+  if (!activeAd) {
+    return null;
+  }
+
   const Logo = activeAd.LogoComponent;
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentIndex((prev) => (prev + 1) % pool.length);
+    setCurrentIndex((prev) => (prev + 1) % dbSquareBanners.length);
   };
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentIndex((prev) => (prev - 1 + pool.length) % pool.length);
+    setCurrentIndex((prev) => (prev - 1 + dbSquareBanners.length) % dbSquareBanners.length);
   };
 
   const handleBannerClick = () => {
@@ -235,7 +163,7 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
           {activeAd.tag}
         </span>
 
-        {autoRotate && (
+        {autoRotate && dbSquareBanners.length > 1 && (
           <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={handlePrev}
@@ -245,7 +173,7 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
             <span className="text-[10px] text-gray-300 font-bold">
-              {(currentIndex % pool.length) + 1}/{pool.length}
+              {(currentIndex % dbSquareBanners.length) + 1}/{dbSquareBanners.length}
             </span>
             <button
               onClick={handleNext}
@@ -280,9 +208,9 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
         </button>
 
-        {autoRotate && (
+        {autoRotate && dbSquareBanners.length > 1 && (
           <div className="flex items-center justify-center gap-1.5 mt-2.5">
-            {pool.map((_, dotIdx) => (
+            {dbSquareBanners.map((_, dotIdx) => (
               <button
                 key={dotIdx}
                 onClick={(e) => {
@@ -291,7 +219,9 @@ export const SquareBanner: React.FC<SquareBannerProps> = ({
                 }}
                 aria-label={`Ir para anúncio ${dotIdx + 1}`}
                 className={`h-1.5 rounded-full transition-all ${
-                  dotIdx === currentIndex % pool.length ? 'w-4 bg-[#7afbae]' : 'w-1.5 bg-white/30'
+                  dotIdx === currentIndex % dbSquareBanners.length
+                    ? 'w-4 bg-[#7afbae]'
+                    : 'w-1.5 bg-white/30'
                 }`}
               />
             ))}

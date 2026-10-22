@@ -9,24 +9,39 @@ import {
   Globe2,
   Briefcase,
   Scale,
+  Tag,
 } from 'lucide-react';
+import { usePortalData } from '../context/PortalDataContext';
 
 interface TopicsRailProps {
   selectedTopic: string;
   onSelectTopic: (topic: string) => void;
 }
 
+function getCategoryIcon(slug: string) {
+  if (slug.includes('agro')) return Sprout;
+  if (slug.includes('cidade')) return Building;
+  if (slug.includes('pol')) return Landmark;
+  if (slug.includes('saude')) return HeartPulse;
+  if (slug.includes('economia')) return TrendingUp;
+  if (slug.includes('geo')) return Globe2;
+  return Tag;
+}
+
 export const TopicsRail: React.FC<TopicsRailProps> = ({ selectedTopic, onSelectTopic }) => {
+  const { categories } = usePortalData();
+  const activeCats = categories.filter((c) => c.isActive !== false);
+
   const topics = [
-    { id: 'todos', label: 'Todos os Temas', Icon: LayoutGrid },
-    { id: 'agro', label: 'Agro', Icon: Sprout, badge: 'EM ALTA' },
-    { id: 'cidade', label: 'Cidade', Icon: Building },
-    { id: 'politica', label: 'Política', Icon: Landmark },
-    { id: 'saude', label: 'Saúde & Bem-Estar', Icon: HeartPulse },
-    { id: 'economia', label: 'Economia', Icon: TrendingUp },
-    { id: 'geopolitica', label: 'Geo Política', Icon: Globe2 },
-    { id: 'empresarial', label: 'Empresarial', Icon: Briefcase },
-    { id: 'lei', label: 'Com a Lei', Icon: Scale },
+    { id: 'todos', label: 'Todos os Temas', Icon: LayoutGrid, badge: undefined as string | undefined },
+    ...activeCats.map((c, idx) => ({
+      id: c.slug,
+      label: c.name,
+      Icon: getCategoryIcon(c.slug),
+      badge: idx === 0 ? 'EM ALTA' : undefined,
+    })),
+    { id: 'empresarial', label: 'Empresarial', Icon: Briefcase, badge: undefined },
+    { id: 'lei', label: 'Com a Lei', Icon: Scale, badge: undefined },
   ];
 
   return (
@@ -47,7 +62,7 @@ export const TopicsRail: React.FC<TopicsRailProps> = ({ selectedTopic, onSelectT
               key={topic.id}
               onClick={() => onSelectTopic(topic.id)}
               type="button"
-              className={`group shrink-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all ${
+              className={`group shrink-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all cursor-pointer ${
                 isSelected
                   ? 'bg-[#0E1B2B] text-white shadow-md'
                   : 'bg-white hover:bg-gray-100 text-gray-800 border border-gray-200'

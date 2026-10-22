@@ -148,6 +148,6 @@ export interface LeadRecord {
   phone?: string;
   email?: string;
   interest?: string;
-  status: 'novo' | 'em_atendimento' | 'fechado';
+  status: 'novo' | 'em_atendimento' | 'fechado' | 'perdido';
   createdAt: string;
 }

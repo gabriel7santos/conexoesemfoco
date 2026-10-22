@@ -2558,6 +2558,7 @@ export const AdminDashboardPage: React.FC = () => {
                               <option value="novo">🟡 Novo Contato</option>
                               <option value="em_atendimento">🔵 Em Negociação</option>
                               <option value="fechado">🟢 Patrocínio Fechado</option>
+                              <option value="perdido">🔴 Perdido</option>
                             </select>
                             <button
                               type="button"
